@@ -1,22 +1,41 @@
 #include <avr/io.h>
+
+#include "main.h"
 #include "uart.h"
 #include "scheduler.h"
 
-// @TODO All routing can be moved to a different file later depending on the rest of the code
+// TODO remove later TEMPORARY VALUES
+char current_unit = MANUAL;
+char current_status = OPENED;
 
-// instructions
-#define SET_UNIT 1
-#define ROLL 2
-#define SET_UNIT_RANGE 3
+uint8_t current_distance = 40;
+uint8_t current_temperature = 19;
+uint8_t current_light = 40;
 
-// units
-#define MANUAL 0
-#define LIGHT 1
-#define TEMPERATURE 1
+// Random values don't copy in later code
+uint8_t light_open;
+uint8_t light_close;
+uint8_t temperature_open;
+uint8_t temperature_close;
 
-// direction
-#define OUT 0
-#define IN 1
+void randomise_temp_values(){
+	
+	
+	current_unit = rand() % 2;
+	current_status = rand() % 3;
+
+	current_distance = rand() % 50;
+	current_temperature = rand() % 30;
+	current_light = rand() % 200;
+
+	// Random values don't copy in later code
+	light_open = rand() % 30;
+	light_close = rand() % 10;
+	temperature_open = rand() % 15;
+	temperature_close = rand() % 30;
+}
+
+// END TEMPORARY CODE
 
 void route_instruction(){
 	if(has_input()){
@@ -37,8 +56,35 @@ void route_instruction(){
 	}
 }
 
+void transmit_unit_values(char unit, uint8_t open_at, uint8_t close_at, uint8_t current_value){
+	transmit((UNIT_VALUE_INFO << 4)|unit);
+	transmit(open_at);
+	transmit(close_at);
+	transmit(current_value);
+}
+
 void transmit_status(){
-	// @TODO Bijvullen wanneer er meer werkelijke gegevens bekend zijn.
+	// TODO remove randomise
+	randomise_temp_values();
+	
+	// Status: Opened, Closed, Expanding, Collapsing (2 bits min.)
+	transmit((STATE_INFO << 4)|current_status);
+	// Current distance (7 bits min.)
+	transmit(current_distance);
+	
+	// Current Unit: Manual, Light of Temperature (3 bits min.)
+	transmit((UNIT_INFO << 4)|current_unit);
+	
+	// TODO add if statement depending on the unit existing
+	
+	// Temperature info:
+	transmit_unit_values(TEMPERATURE, temperature_open, temperature_close, current_temperature);
+	
+	// Light info:
+	transmit_unit_values(LIGHT, light_open, light_close, current_light);
+
+	transmit('\r');
+	transmit('\n');
 }
 
 void init(){
@@ -54,6 +100,9 @@ void init(){
 
 int main(void)
 {
+	// TODO remove later
+	srand(time());
+	
    init();
    while(1) {
 	   SCH_Dispatch_Tasks();

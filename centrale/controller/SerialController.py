@@ -1,4 +1,6 @@
-from serial import Serial, SerialException
+from serial import Serial, SerialException, to_bytes
+
+from model.Response import Response
 
 
 class SerialController:
@@ -26,6 +28,12 @@ class SerialController:
     def read_input(self):
         input = {}
         for device in self.__devices:
+            values = {}
             connection = self.__devices[device].get_connection()
-            input[device] = connection.read_all()
+            if connection.inWaiting():
+                response = connection.read_until(terminator=to_bytes([13, 10]))  # End with CR LF
+                values = Response(response[:-2]).decode()
+
+            input[device] = values
+
         return input
