@@ -18,9 +18,7 @@ uint8_t light_close;
 uint8_t temperature_open;
 uint8_t temperature_close;
 
-void randomise_temp_values(){
-	
-	
+void randomize_temp_values(){
 	current_unit = rand() % 2;
 	current_status = rand() % 3;
 
@@ -64,8 +62,8 @@ void transmit_unit_values(char unit, uint8_t open_at, uint8_t close_at, uint8_t 
 }
 
 void transmit_status(){
-	// TODO remove randomise
-	randomise_temp_values();
+	// TODO remove randomize
+	randomize_temp_values();
 	
 	// Status: Opened, Closed, Expanding, Collapsing (2 bits min.)
 	transmit((STATE_INFO << 4)|current_status);
