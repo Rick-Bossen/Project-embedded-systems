@@ -5,8 +5,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from centrale.view.label_tups import tab_settings, tab_data
-
+from view.label_tups import tab_settings, tab_data
 
 
 class Root(Tk):
@@ -17,6 +16,10 @@ class Root(Tk):
         self.maxsize(800, 480)
 
         self.nb = ttk.Notebook(self)
+        self.nb.grid(column=0, row=0)
+
+        self.data_button = Button(self, text='Data', relief='raised', command=self.data_button_pressed())
+        self.data_button.grid(column=1, row=0, sticky='ne')
 
     # add a tab to the notebook
     def add_tab(self):
@@ -25,8 +28,6 @@ class Root(Tk):
         self.create_data_frame(frame)
 
         self.nb.add(frame, text='test')
-        self.nb.update()
-        self.nb.grid(column=0, row=0)
 
     # creates the settings frame within the tab
     def create_settings_frame(self, frame):
@@ -92,13 +93,15 @@ class Root(Tk):
     def disable_tab(self, index):
         self.nb.forget(index)
 
+    # TODO implement button to display the data view
+    def data_button_pressed(self):
+        pass
+
+    def interval(self, speed, function):
+        self.after(speed, lambda: [self.interval(speed, function), function()])
+
 # creates a new frame if this file is run, mainly for testing purposes
 if __name__ == '__main__':
     root = Root()
-    root.add_tab()
-    root.add_tab()
-    root.add_tab()
-    root.add_tab()
-    root.add_tab()
-    root.add_tab()
+    root.after(1000, root.add_tab())
     root.mainloop()
