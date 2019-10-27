@@ -12,11 +12,15 @@ class Response:
 
         while len(bytes) > 0:
             byte = bytes.pop(0)
+            type = byte >> 4
+
+            if type not in [inner for inner in ResponseType]:
+                continue
+            elif not self.decoded_response:
+                self.decoded_response = {}
+
             response_type = ResponseType(byte >> 4)
             value = byte & 0x0F
-
-            if not self.decoded_response:
-                self.decoded_response = {}
 
             if response_type is ResponseType.STATE_INFO:
                 self.decoded_response['state'] = {
