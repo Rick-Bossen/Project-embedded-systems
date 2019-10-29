@@ -1,11 +1,11 @@
 from tkinter import *
 from tkinter import ttk
+from view.label_tups import tab_settings, tab_data
+from view.DataView import DataView
 
 import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-from view.label_tups import tab_settings, tab_data
 
 
 class Root(Tk):
@@ -13,12 +13,13 @@ class Root(Tk):
         super(Root, self).__init__()
         self.title('Centrale')
         self.minsize(800, 480)
-        self.maxsize(800, 480)
+        self.maxsize(900, 480)
 
         self.nb = ttk.Notebook(self)
         self.nb.grid(column=0, row=0)
+        self.dataview = DataView(self)
 
-        self.data_button = Button(self, text='Data', relief='raised', command=self.data_button_pressed())
+        self.data_button = Button(self, text='Data', command=lambda: self.data_button_pressed())
         self.data_button.grid(column=1, row=0, sticky='ne')
 
     # add a tab to the notebook
@@ -93,15 +94,15 @@ class Root(Tk):
     def disable_tab(self, index):
         self.nb.forget(index)
 
-    # TODO implement button to display the data view
     def data_button_pressed(self):
-        pass
+        self.dataview.toggle()
 
     def interval(self, speed, function):
         self.after(speed, lambda: [self.interval(speed, function), function()])
 
+
 # creates a new frame if this file is run, mainly for testing purposes
 if __name__ == '__main__':
     root = Root()
-    root.after(1000, root.add_tab())
+    root.add_tab()
     root.mainloop()
