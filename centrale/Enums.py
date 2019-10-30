@@ -46,8 +46,8 @@ class Instruction(IntEnum):
             if len(args) is not 1:
                 raise ValueError('ROLL can only have 1 argument')
 
-            if args[0] not in [State.ROLLED_IN, State.ROLLED_IN]:
-                raise ValueError('Argument 1 should be instance of Unit')
+            if args[0] not in State:
+                raise ValueError('Argument 1 should be instance of State')
 
             output[0] += args[0]
 

@@ -3,13 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Atmel Studio Solution File, Format Version 11.00
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Bestuuringseenheid", "Bestuuringseenheid.cproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E9E43F5E-90DC-4C1C-8B45-EB7E7396FEB7}"
-	ProjectSection(SolutionItems) = preProject
-		main.h = main.h
-		temp_values.h = temp_values.h
-	EndProjectSection
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "GccApplication4", "GccApplication4\GccApplication4.cproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
