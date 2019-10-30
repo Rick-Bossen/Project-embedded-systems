@@ -17,6 +17,13 @@ class State(IntEnum):
 
 
 @unique
+class ResponseType(IntEnum):
+    STATE_INFO = 1
+    UNIT_INFO = 2
+    UNIT_VALUE_INFO = 3
+
+
+@unique
 class Instruction(IntEnum):
     SET_UNIT = 1
     ROLL = 2

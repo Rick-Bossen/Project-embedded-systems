@@ -1,37 +1,38 @@
 from tkinter import *
 from tkinter import ttk
-from view.label_tups import tab_settings, tab_data
 from view.DataView import DataView
 
 import matplotlib
 matplotlib.use('TkAgg')
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class Root(Tk):
-    def __init__(self):
+    def __init__(self, sharedvar):
         super(Root, self).__init__()
         self.title('Centrale')
         self.minsize(800, 480)
         self.maxsize(900, 480)
+        self.sharedvar = sharedvar
+        self.devices = []
 
         self.nb = ttk.Notebook(self)
         self.nb.grid(column=0, row=0)
-        self.dataview = DataView(self)
+        self.dataview = DataView(self, sharedvar)
 
         self.data_button = Button(self, text='Data', command=lambda: self.data_button_pressed())
         self.data_button.grid(column=1, row=0, sticky='ne')
 
     # add a tab to the notebook
-    def add_tab(self):
-        frame = Frame(self)
-        self.create_settings_frame(frame)
-        self.create_data_frame(frame)
+    def add_tab(self, port, device):
+        frame = Frame(self, name=port.lower())
+        self.devices.append(device)
+        self.create_settings_frame(frame, device.tab_settings)
+        self.create_data_frame(frame, device.tab_data)
 
-        self.nb.add(frame, text='test')
+        self.nb.add(frame, text=port)
 
     # creates the settings frame within the tab
-    def create_settings_frame(self, frame):
+    def create_settings_frame(self, frame, tab_settings):
         settingsframe = Frame(frame)
         titlelabel = Label(settingsframe, text='Instellingen')
         titlelabel.grid(row=0, column=0, sticky='nw')
@@ -65,7 +66,7 @@ class Root(Tk):
         settingsframe.grid(row=0, column=0, sticky='nw')
 
     # creates the data frame within the tab
-    def create_data_frame(self, frame):
+    def create_data_frame(self, frame, tab_data):
         # TODO fill in data using units
         # TODO fix spacing issues
         dataframe = Frame(frame)

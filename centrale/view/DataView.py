@@ -1,10 +1,10 @@
 from tkinter import *
-from view.label_tups import data as data_tup
 
 
 # TODO add live data and graphs to view
 class DataView:
-    def __init__(self, parent):
+    def __init__(self, parent, sharedvars):
+        self.sharedvars = sharedvars
         self.top = Toplevel(parent)
         self.create_main_frame(self.top)
 
@@ -26,7 +26,7 @@ class DataView:
     def create_statistics_frame(self, frame):
         data_frame = Frame(frame)
         row = 1
-        for label in data_tup:
+        for label in self.sharedvars.data:
             lab = Label(data_frame, text=label + ':')
             lab.grid(row=row, column=0, sticky='nw')
             row += 1
