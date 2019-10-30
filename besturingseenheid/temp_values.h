@@ -4,9 +4,7 @@
 #define TEMP_H
 
 char current_unit = MANUAL;
-char current_status = OPENED;
 
-uint8_t current_distance = 40;
 uint8_t current_temperature = 19;
 uint8_t current_light = 40;
 

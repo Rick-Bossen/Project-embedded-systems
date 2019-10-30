@@ -2,13 +2,12 @@
 
 #include "main.h"
 #include "uart.h"
+#include "sunblind.h"
 #include "scheduler.h"
 
 // TODO remove later TEMPORARY VALUES
 char current_unit = MANUAL;
-char current_status = OPENED;
 
-uint8_t current_distance = 40;
 uint8_t current_temperature = 19;
 uint8_t current_light = 40;
 
@@ -20,9 +19,6 @@ uint8_t temperature_close;
 
 void randomize_temp_values(){
 	current_unit = rand() % 2;
-	current_status = rand() % 3;
-
-	current_distance = rand() % 50;
 	current_temperature = rand() % 30;
 	current_light = rand() % 200;
 
@@ -34,17 +30,17 @@ void randomize_temp_values(){
 }
 
 // END TEMPORARY CODE
-
 void route_instruction(){
 	if(has_input()){
 		uint8_t input = receive();
 		uint8_t code = input >> 4;
+		
 		if(code == SET_UNIT){
 			uint8_t unit = input & 0x07;
 			//set_unit(input)
 		}else if(code == ROLL){
 			uint8_t direction = input & 0x01;
-			//roll(direction)
+			roll(direction);
 		}else if (code == SET_UNIT_RANGE){
 			uint8_t unit = input & 0x07;
 			uint8_t minimum = receive();
@@ -89,10 +85,15 @@ void init(){
 	// UART
 	uart_init();
 	
+	DDRB = 0xFF; // Set port B to output
+	DDRC = 0x00 | ULTRASONIC_TRIGGER; // Set ultrasonic trigger to output
+	current_status = CLOSED;
+	
 	// Scheduler
 	SCH_Init_T1();
 	SCH_Add_Task(route_instruction, 0, 5); // Check every 50ms for input
 	SCH_Add_Task(transmit_status, 0, 6000); // Send status every 60s
+	SCH_Add_Task(check_sunblind_position, 0, 50); // Checking state every 500ms
 	SCH_Start();
 }
 
@@ -108,4 +109,3 @@ int main(void)
    
    return 0;
 }
-
