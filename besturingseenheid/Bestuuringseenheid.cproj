@@ -144,13 +144,13 @@
     <Compile Include="scheduler.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="sensors.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="sunblind.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="sunblind.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="temp_values.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="uart.c">

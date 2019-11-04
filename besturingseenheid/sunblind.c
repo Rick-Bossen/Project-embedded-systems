@@ -16,7 +16,7 @@ uint8_t measure_distance(){
 	PORTC &= ~ULTRASONIC_TRIGGER;
 	loop_until_bit_is_set(PINC, PORTC1);
 	TCNT1 = 0;
-	loop_until_bit_is_clear(PINC, PORTC1);
+	loop_until_bit_is_clear(PINC, PINC1);
 	uint16_t time = TCNT1;
 	distance_cm = time / 4;
 	
