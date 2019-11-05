@@ -74,8 +74,8 @@ void init(){
 	// UART
 	uart_init();
 	
-	DDRB = 0xFF; // Set port B to output
-	DDRC = 0x00 | ULTRASONIC_TRIGGER; // Set ultrasonic trigger to output
+	DDRB = 0xFF;
+	DDRD = 0x00 | ULTRASONIC_TRIGGER;
 	
 	current_status = CLOSED;
 	current_unit = 0xff;

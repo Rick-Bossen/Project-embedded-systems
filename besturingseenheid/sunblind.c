@@ -7,16 +7,16 @@
 
 uint8_t measure_distance(){
 	uint8_t distance_cm = 0;
-	PINC = 0x00;
+	PIND &= ~ULTRASONIC_ECHO;
 	
-	PORTC &= ~ULTRASONIC_TRIGGER;
+	PORTD &= ~ULTRASONIC_TRIGGER;
 	_delay_ms(2);
-	PORTC |= ULTRASONIC_TRIGGER;
+	PORTD |= ULTRASONIC_TRIGGER;
 	_delay_us(10);
-	PORTC &= ~ULTRASONIC_TRIGGER;
-	loop_until_bit_is_set(PINC, PORTC1);
+	PORTD &= ~ULTRASONIC_TRIGGER;
+	loop_until_bit_is_set(PIND, PIND5);
 	TCNT1 = 0;
-	loop_until_bit_is_clear(PINC, PINC1);
+	loop_until_bit_is_clear(PIND, PIND5);
 	uint16_t time = TCNT1;
 	distance_cm = time / 4;
 	
