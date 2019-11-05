@@ -80,13 +80,13 @@ void init(){
 	current_status = CLOSED;
 	current_unit = 0xff;
 	
-	light_open = 10;
-	light_close = 20;
-	temperature_open = 20;
-	temperature_close = 15;
+	light_open = 50;
+	light_close = 100;
+	temperature_open = 15;
+	temperature_close = 25;
 	
 	// ADC init
-	ADCSRA |= ((1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0));
+	ADCSRA |= (1<<ADPS2);
 	ADMUX |= (1<<REFS0);
 	ADCSRA |= (1<<ADEN);
 	ADCSRA |= (1<<ADSC);
