@@ -1,3 +1,5 @@
+#include <avr/io.h>
+
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -22,7 +24,16 @@
 #define UNIT_INFO 2
 #define UNIT_VALUE_INFO 3
 
+uint8_t current_unit;
 char current_status;
+
 uint8_t current_distance;
+uint8_t current_temperature;
+uint8_t current_light;
+
+uint8_t light_open;
+uint8_t light_close;
+uint8_t temperature_open;
+uint8_t temperature_close;
 
 #endif
