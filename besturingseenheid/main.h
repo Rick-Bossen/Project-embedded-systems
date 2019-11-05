@@ -1,3 +1,5 @@
+#include <avr/io.h>
+
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -29,9 +31,9 @@ uint8_t current_distance;
 uint8_t current_temperature;
 uint8_t current_light;
 
-uint8_t light_open = 20;
-uint8_t light_close = 30;
-uint8_t temperature_open = 10;
-uint8_t temperature_close = 30;
+uint8_t light_open;
+uint8_t light_close;
+uint8_t temperature_open;
+uint8_t temperature_close;
 
 #endif

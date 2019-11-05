@@ -3,6 +3,7 @@
 #include "main.h"
 #include "uart.h"
 #include "sunblind.h"
+#include "sensors.h"
 #include "scheduler.h"
 
 void set_unit(uint8_t unit){
@@ -26,7 +27,7 @@ void route_instruction(){
 		
 		if(code == SET_UNIT){
 			uint8_t unit = input & 0x07;
-			set_unit(input)
+			set_unit(unit);
 		}else if(code == ROLL){
 			uint8_t direction = input & 0x01;
 			roll(direction);
@@ -34,7 +35,7 @@ void route_instruction(){
 			uint8_t unit = input & 0x07;
 			uint8_t minimum = receive();
 			uint8_t maximum = receive();
-			set_unit_range(unit, minimum, maximum)
+			set_unit_range(unit, minimum, maximum);
 		}
 	}
 }
@@ -77,7 +78,18 @@ void init(){
 	DDRC = 0x00 | ULTRASONIC_TRIGGER; // Set ultrasonic trigger to output
 	
 	current_status = CLOSED;
-	current_unit = -1;
+	current_unit = 0xff;
+	
+	light_open = 10;
+	light_close = 20;
+	temperature_open = 20;
+	temperature_close = 15;
+	
+	// ADC init
+	ADCSRA |= ((1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0));
+	ADMUX |= (1<<REFS0);
+	ADCSRA |= (1<<ADEN);
+	ADCSRA |= (1<<ADSC);
 	
 	// Scheduler
 	SCH_Init_T1();

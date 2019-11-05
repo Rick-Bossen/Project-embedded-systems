@@ -147,6 +147,9 @@
     <Compile Include="sensors.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="sensors.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="sunblind.c">
       <SubType>compile</SubType>
     </Compile>
