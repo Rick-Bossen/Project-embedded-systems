@@ -14,8 +14,9 @@ class Root(Tk):
         self.maxsize(900, 480)
         self.sharedvar = sharedvar
         self.devices = []
+        self.devicedata = {}
 
-        self.nb = ttk.Notebook(self)
+        self.nb = ttk.Notebook(self, name='notebook')
         self.nb.grid(column=0, row=0)
         self.dataview = DataView(self, sharedvar)
 
@@ -26,14 +27,15 @@ class Root(Tk):
     def add_tab(self, port, device):
         frame = Frame(self, name=port.lower())
         self.devices.append(device)
-        self.create_settings_frame(frame, device.tab_settings)
-        self.create_data_frame(frame, device.tab_data)
+        self.devicedata[port] = {}
+        self.create_settings_frame(frame, device.tab_settings, port)
+        self.create_data_frame(frame, device.tab_data, port)
 
         self.nb.add(frame, text=port)
 
     # creates the settings frame within the tab
-    def create_settings_frame(self, frame, tab_settings):
-        settingsframe = Frame(frame)
+    def create_settings_frame(self, frame, tab_settings, port):
+        settingsframe = Frame(frame, name='settings')
         titlelabel = Label(settingsframe, text='Instellingen')
         titlelabel.grid(row=0, column=0, sticky='nw')
 
@@ -66,10 +68,10 @@ class Root(Tk):
         settingsframe.grid(row=0, column=0, sticky='nw')
 
     # creates the data frame within the tab
-    def create_data_frame(self, frame, tab_data):
+    def create_data_frame(self, frame, tab_data, port):
         # TODO fill in data using units
         # TODO fix spacing issues
-        dataframe = Frame(frame)
+        dataframe = Frame(frame, name='data')
         titlelabel = Label(dataframe, text='Data')
         titlelabel.grid(row=0, column=0)
 
@@ -80,6 +82,26 @@ class Root(Tk):
             lab.grid(row=row, column=0, sticky='nw')
             row += 1
 
+        # add all label variables to dictionary
+        self.devicedata[port]['state'] = {}
+        statevar = StringVar()
+        statevar.set('N/A')
+        statelab = Label(dataframe, textvar=statevar)
+        statelab.grid(row=3, column=1, sticky='nw')
+        self.devicedata[port]['state']['name'] = statevar
+
+        self.devicedata[port]['unit'] = {}
+
+        self.devicedata[port]['unit_values'] = {}
+        lightvar = IntVar()
+        lightlab = Label(dataframe, textvar=lightvar)
+        lightlab.grid(row=2, column=1, sticky='nw')
+        self.devicedata[port]['unit_values']['light'] = lightvar
+
+        tempvar = IntVar()
+        templab = Label(dataframe, textvar=tempvar)
+        templab.grid(row=1, column=1, sticky='nw')
+        self.devicedata[port]['unit_values']['temperature'] = tempvar
         self.create_graph(dataframe)
 
         dataframe.grid(row=0, column=1, sticky='nw')
@@ -101,9 +123,13 @@ class Root(Tk):
     def interval(self, speed, function):
         self.after(speed, lambda: [self.interval(speed, function), function()])
 
+    def updatetab(self, device, data):
+        for k, v in data.items():
+            for k2, v2 in v.items():
+                if k2 in self.devicedata[device][k] and not k2 == 'light' and not k2 == 'temperature':
+                    self.devicedata[device][k][k2].set(v2)
+                elif k2 == 'light' or k2 == 'temperature':
+                    self.devicedata[device][k][k2].set(v2['current'])
 
-# creates a new frame if this file is run, mainly for testing purposes
-if __name__ == '__main__':
-    root = Root()
-    root.add_tab()
-    root.mainloop()
+    def updatedataview(self, data):
+        self.dataview.updateData(data)
