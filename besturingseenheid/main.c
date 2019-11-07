@@ -29,6 +29,7 @@ void route_instruction(){
 			uint8_t unit = input & 0x07;
 			set_unit(unit);
 		}else if(code == ROLL){
+			set_unit(MANUAL); // If manual roll in or out, don't overwrite it again with temperature until changed manually.
 			uint8_t direction = input & 0x01;
 			roll(direction);
 		}else if (code == SET_UNIT_RANGE){
@@ -94,10 +95,10 @@ void init(){
 	// Scheduler
 	SCH_Init_T1();
 	SCH_Add_Task(route_instruction, 0, 5); // Check every 50ms for input
-	SCH_Add_Task(transmit_status, 0, 6000); // Send status every 60s
+	SCH_Add_Task(transmit_status, 0, 600); // Send status every 60s
 	SCH_Add_Task(check_sunblind_position, 0, 50); // Checking state every 500ms
-	SCH_Add_Task(check_temperature, 0, 4000); // Checking state every 40s
-	SCH_Add_Task(check_light, 0, 3000); // Checking state every 30s
+	SCH_Add_Task(check_temperature, 0, 400); // Checking state every 40s
+	SCH_Add_Task(check_light, 0, 300); // Checking state every 30s
 	SCH_Start();
 }
 

@@ -1,30 +1,33 @@
-from centrale.model.Device import Device
-from centrale.view.main import Root
-from centrale.model.SharedVars import SharedVar
-from centrale.controller.SerialController import SerialController
-from centrale.controller.ViewController import ViewController
+from model.Device import Device
+from view.MainView import Root
+from model.SharedVars import SharedVar
+from controller.SerialController import SerialController
+from controller.ViewController import ViewController
+
+serialcontroller = SerialController()
 
 sharedvar = SharedVar()
-window = Root(sharedvar)
+window = Root(sharedvar, serialcontroller)
 sharedvar.initvars(window)
-serialcontroller = SerialController()
 viewcontroller = ViewController(window, sharedvar)
-# devices = serialcontroller.find_devices()
 
 
-def test():
+def check_devices():
     devices = serialcontroller.find_devices()
     for device in devices:
         try:
             window.nametowidget(device.lower())
         except KeyError:
             window.add_tab(device, devices[device])
+    serialcontroller.check_connections()
 
-def test2():
+
+def check_input():
     input = serialcontroller.read_input()
     for device in input:
         print(device, input[device])
 
-window.interval(1000, test)
-window.interval(60000, test2)
+
+window.interval(1000, check_devices)
+window.interval(6000, check_input)
 window.mainloop()

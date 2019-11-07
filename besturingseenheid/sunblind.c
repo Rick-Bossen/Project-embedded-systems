@@ -7,7 +7,7 @@
 
 uint8_t measure_distance(){
 	uint8_t distance_cm = 0;
-	PIND &= ~ULTRASONIC_ECHO;
+	PIND = 0x00;
 	
 	PORTD &= ~ULTRASONIC_TRIGGER;
 	_delay_ms(2);

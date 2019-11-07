@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import ttk
+
+from Enums import Instruction, State
 from view.DataView import DataView
 
 import matplotlib
@@ -7,7 +9,7 @@ matplotlib.use('TkAgg')
 
 
 class Root(Tk):
-    def __init__(self, sharedvar):
+    def __init__(self, sharedvar, serialcontroller):
         super(Root, self).__init__()
         self.title('Centrale')
         self.minsize(800, 480)
@@ -22,6 +24,8 @@ class Root(Tk):
 
         self.data_button = Button(self, text='Data', command=lambda: self.data_button_pressed())
         self.data_button.grid(column=1, row=0, sticky='ne')
+
+        self.serialcontroller = serialcontroller
 
     # add a tab to the notebook
     def add_tab(self, port, device):
@@ -64,6 +68,13 @@ class Root(Tk):
         unit_temp.grid(row=4, column=1)
         unit_light = OptionMenu(settingsframe, unit_light_var, *temp)
         unit_light.grid(row=5, column=1)
+
+        roll_in_button = Button(settingsframe, text='Inrollen',
+            command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_IN)))
+        roll_in_button.grid(row=6, column=0)
+        roll_out_button = Button(settingsframe,text='Uitrollen',
+            command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_OUT)))
+        roll_out_button.grid(row=6, column=1)
 
         settingsframe.grid(row=0, column=0, sticky='nw')
 
