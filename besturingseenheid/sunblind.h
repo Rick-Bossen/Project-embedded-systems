@@ -5,8 +5,8 @@
 #define LED_YELLOW _BV(PORTB1)
 #define LED_GREEN _BV(PORTB2)
 
-#define ULTRASONIC_TRIGGER _BV(PORTC0)
-#define ULTRASONIC_ECHO PORTC1
+#define ULTRASONIC_TRIGGER _BV(PORTD4)
+#define ULTRASONIC_ECHO _BV(PORTD5)
 
 void check_sunblind_position();
 void set_leds();

@@ -12,8 +12,8 @@ uint16_t read_adc(uint8_t channel)
 }
 
 void check_temperature(){
-	float voltage = read_adc(TEMPERATURE) * 5.0 / 1024.0;
-	uint8_t temperature = (uint8_t)(voltage - 0.5) * 100;
+	float voltage = read_adc(TEMPERATURE_PIN) * 5.0 / 1023.0;
+	uint8_t temperature = (uint8_t)((voltage - 0.5) * 100);
 
 	if(temperature > 0){
 		current_temperature = temperature;
@@ -32,7 +32,8 @@ void check_temperature(){
 }
 
 void check_light(){
-	uint8_t light = (uint8_t)read_adc(LIGHT_PIN) * 100;
+	uint16_t ADC_VALUE = read_adc(LIGHT_PIN);
+	uint8_t light = (uint8_t) (ADC_VALUE / 4); // 10 bits to max. 8 bits
 	
 	if(light > 0){
 		current_light = light;
