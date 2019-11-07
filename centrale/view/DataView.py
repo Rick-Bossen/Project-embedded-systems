@@ -5,6 +5,7 @@ from tkinter import *
 class DataView:
     def __init__(self, parent, sharedvars):
         self.sharedvars = sharedvars
+        self.data = {}
         self.top = Toplevel(parent)
         self.create_main_frame(self.top)
 
@@ -25,11 +26,59 @@ class DataView:
     # creates the frame within the main frame that contains all the numeric data
     def create_statistics_frame(self, frame):
         data_frame = Frame(frame)
+
+        # creates all the labels
         row = 1
         for label in self.sharedvars.data:
             lab = Label(data_frame, text=label + ':')
             lab.grid(row=row, column=0, sticky='nw')
             row += 1
+
+        # creates all the variable labels and variables
+        maxtempvar = IntVar()
+        maxtemplab = Label(data_frame, textvar=maxtempvar)
+        maxtemplab.grid(row=1, column=1, sticky='nw')
+        self.data['maxtemp'] = maxtempvar
+
+        mintempvar = IntVar()
+        mintemplab = Label(data_frame, textvar=mintempvar)
+        mintemplab.grid(row=2, column=1, sticky='nw')
+        self.data['mintemp'] = mintempvar
+
+        avgtempvar = IntVar()
+        avgtemplab = Label(data_frame, textvar=avgtempvar)
+        avgtemplab.grid(row=3, column=1, sticky='nw')
+        self.data['avgtemp'] = avgtempvar
+
+        maxlightvar = IntVar()
+        maxlightlab = Label(data_frame, textvar=maxlightvar)
+        maxlightlab.grid(row=4, column=1, sticky='nw')
+        self.data['maxlight'] = maxlightvar
+
+        minlightvar = IntVar()
+        minlightlab = Label(data_frame, textvar=minlightvar)
+        minlightlab.grid(row=5, column=1, sticky='nw')
+        self.data['minlight'] = minlightvar
+
+        avglightvar = IntVar()
+        avglightlab = Label(data_frame, textvar=avglightvar)
+        avglightlab.grid(row=6, column=1, sticky='nw')
+        self.data['avglight'] = avglightvar
+
+        unitsvar = IntVar()
+        unitslab = Label(data_frame, textvar=unitsvar)
+        unitslab.grid(row=7, column=1, sticky='nw')
+        self.data['units'] = unitsvar
+
+        tempunitsvar = IntVar()
+        tempunitslab = Label(data_frame, textvar=tempunitsvar)
+        tempunitslab.grid(row=8, column=1, sticky='nw')
+        self.data['tempunits'] = tempunitsvar
+
+        lightunitsvar = IntVar()
+        lightunitslab = Label(data_frame, textvar=lightunitsvar)
+        lightunitslab.grid(row=9, column=1, sticky='nw')
+        self.data['lightunits'] = lightunitsvar
 
         data_frame.grid(row=1, column=0, rowspan=2)
 
@@ -45,3 +94,37 @@ class DataView:
         else:
             self.top.deiconify()
             self.visible = 1
+
+    # increments the total connected units
+    def addunit(self):
+        self.data['units'].set(self.data['units'].get() + 1)
+
+    # updates the data
+    def updateData(self, data):
+        units = 0
+        lightunits = 0
+        tempunits = 0
+        for device in data:
+            if data[device]:
+                units += 1
+                temp = data[device]
+                if 'unit' in temp:
+                    unit = temp['unit']
+                    unit_values = temp['unit_values'][unit['name'].lower()]
+                    print(unit_values)
+                    if unit['name'] == 'LIGHT':
+                        lightunits += 1
+                        if self.data['maxlight'].get() < unit_values['current']:
+                            self.data['maxlight'].set(unit_values['current'])
+                        if self.data['minlight'].get() > unit_values['current']:
+                            self.data['minlight'].set(unit_values['current'])
+                    elif unit['name'] == 'TEMPERATURE':
+                        tempunits += 1
+                        if self.data['maxtemp'].get() < unit_values['current']:
+                            self.data['maxtemp'].set(unit_values['current'])
+                        if self.data['mintemp'].get() > unit_values['current']:
+                            self.data['mintemp'].set(unit_values['current'])
+
+        self.data['units'].set(units)
+        self.data['lightunits'].set(lightunits)
+        self.data['tempunits'].set(tempunits)

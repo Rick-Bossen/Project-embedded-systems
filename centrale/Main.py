@@ -12,7 +12,8 @@ sharedvar.initvars(window)
 viewcontroller = ViewController(window, sharedvar)
 
 
-def check_devices():
+# checks for new devices
+def checkdevices():
     devices = serialcontroller.find_devices()
     for device in devices:
         try:
@@ -22,12 +23,17 @@ def check_devices():
     serialcontroller.check_connections()
 
 
-def check_input():
+# updates the view with new data
+def updateview():
+    serialcontroller.check_connections()
     input = serialcontroller.read_input()
     for device in input:
-        print(device, input[device])
+        if input[device]:
+            print(input[device])
+            window.updatetab(device, input[device])
+    window.updatedataview(input)
 
 
-window.interval(1000, check_devices)
-window.interval(6000, check_input)
+window.interval(1000, checkdevices)
+window.interval(6000, updateview)
 window.mainloop()

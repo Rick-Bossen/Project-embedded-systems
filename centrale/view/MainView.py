@@ -8,6 +8,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 
+# TODO make use of settings
 class Root(Tk):
     def __init__(self, sharedvar, serialcontroller):
         super(Root, self).__init__()
@@ -29,11 +30,13 @@ class Root(Tk):
 
     # add a tab to the notebook
     def add_tab(self, port, device):
+        self.dataview.addunit()
         frame = Frame(self, name=port.lower())
         self.devices.append(device)
         self.devicedata[port] = {}
         self.create_settings_frame(frame, device.tab_settings, port)
         self.create_data_frame(frame, device.tab_data, port)
+        self.updatedropdowns()
 
         self.nb.add(frame, text=port)
 
@@ -52,21 +55,35 @@ class Root(Tk):
 
         # creates all the setting modifiers
         # TODO create toggle button
-        # TODO fill default states using sensor input
-        # TODO fill dropdown with available units
-        temp = ('temp1', 'temp2', 'temp3')
+        self.devicedata[port]['settings'] = {}
         unit_temp_var = StringVar(settingsframe)
+        unit_temp_var.set(port)
+        self.devicedata[port]['settings']['unit_temp_var'] = unit_temp_var
         unit_light_var = StringVar(settingsframe)
+        unit_light_var.set(port)
+        self.devicedata[port]['settings']['unit_light_var'] = unit_light_var
 
         placeholder_button = Label(settingsframe, text='placeholder')
         placeholder_button.grid(row=1, column=1)
-        toggle_temp = Entry(settingsframe)
+
+        toggle_temp_var = IntVar()
+        toggle_temp_var.set(20)
+        toggle_temp = Entry(settingsframe, textvar=toggle_temp_var)
+        self.devicedata[port]['settings']['toggle_temp'] = toggle_temp_var
         toggle_temp.grid(row=2, column=1)
-        toggle_light = Entry(settingsframe)
+
+        toggle_light_var = IntVar()
+        toggle_light_var.set(20)
+        toggle_light = Entry(settingsframe, textvar=toggle_light_var)
+        self.devicedata[port]['settings']['toggle_light'] = toggle_light_var
         toggle_light.grid(row=3, column=1)
-        unit_temp = OptionMenu(settingsframe, unit_temp_var, *temp)
+
+        unit_temp = OptionMenu(settingsframe, unit_temp_var, *self.devicedata)
+        self.devicedata[port]['settings']['unit_temp'] = unit_temp
         unit_temp.grid(row=4, column=1)
-        unit_light = OptionMenu(settingsframe, unit_light_var, *temp)
+
+        unit_light = OptionMenu(settingsframe, unit_light_var, *self.devicedata)
+        self.devicedata[port]['settings']['unit_light'] = unit_light
         unit_light.grid(row=5, column=1)
 
         roll_in_button = Button(settingsframe, text='Inrollen',
@@ -80,7 +97,6 @@ class Root(Tk):
 
     # creates the data frame within the tab
     def create_data_frame(self, frame, tab_data, port):
-        # TODO fill in data using units
         # TODO fix spacing issues
         dataframe = Frame(frame, name='data')
         titlelabel = Label(dataframe, text='Data')
@@ -131,9 +147,11 @@ class Root(Tk):
     def data_button_pressed(self):
         self.dataview.toggle()
 
+    # used to run a function in a specified interval
     def interval(self, speed, function):
         self.after(speed, lambda: [self.interval(speed, function), function()])
 
+    # updates the specified tab with new data
     def updatetab(self, device, data):
         for k, v in data.items():
             for k2, v2 in v.items():
@@ -142,5 +160,17 @@ class Root(Tk):
                 elif k2 == 'light' or k2 == 'temperature':
                     self.devicedata[device][k][k2].set(v2['current'])
 
+    # updates the drop down menu's of all tabs
+    def updatedropdowns(self):
+        for device in self.devicedata:
+            print(device)
+            temp = self.devicedata[device]['settings']
+            temp['unit_temp']['menu'].delete(0, 'end')
+            temp['unit_light']['menu'].delete(0, 'end')
+            for port in self.devicedata:
+                temp['unit_temp']['menu'].add_command(label=port)
+                temp['unit_light']['menu'].add_command(label=port)
+
+    # updates the data view with new data
     def updatedataview(self, data):
         self.dataview.updateData(data)
