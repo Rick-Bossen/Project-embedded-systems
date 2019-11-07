@@ -1,5 +1,5 @@
 from centrale.model.Device import Device
-from centrale.view.main import Root
+from centrale.view.MainView import Root
 from centrale.model.SharedVars import SharedVar
 from centrale.controller.SerialController import SerialController
 from centrale.controller.ViewController import ViewController
@@ -9,10 +9,10 @@ window = Root(sharedvar)
 sharedvar.initvars(window)
 serialcontroller = SerialController()
 viewcontroller = ViewController(window, sharedvar)
-# devices = serialcontroller.find_devices()
 
 
-def test():
+# checks for new devices
+def checkdevices():
     devices = serialcontroller.find_devices()
     for device in devices:
         try:
@@ -20,11 +20,18 @@ def test():
         except KeyError:
             window.add_tab(device, devices[device])
 
-def test2():
+
+# updates the view with new data
+def updateview():
+    serialcontroller.check_connections()
     input = serialcontroller.read_input()
     for device in input:
-        print(device, input[device])
+        if input[device]:
+            print(input[device])
+            window.updatetab(device, input[device])
+    window.updatedataview(input)
 
-window.interval(1000, test)
-window.interval(60000, test2)
+
+window.interval(1000, checkdevices)
+window.interval(60000, updateview)
 window.mainloop()
