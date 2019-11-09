@@ -20,6 +20,7 @@ def checkdevices():
             window.nametowidget(device.lower())
         except KeyError:
             window.add_tab(device, devices[device])
+            window.add_tab(device + 'test', devices[device])
     serialcontroller.check_connections()
 
 

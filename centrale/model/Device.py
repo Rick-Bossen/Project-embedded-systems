@@ -13,7 +13,7 @@ class Device:
         self.tab_settings = {'Handmatig uitrollen': 0, 'Uitrol temperatuur': float(20),
                              'Uitrol lichtintensiteit': 7, 'Unit voor temperatuursensor': 'unit 2',
                              'Unit voor lichtsensor': 'unit 2'}
-        self.tab_data = {'Temperatuur': 0, 'Licht intensiteit': 0, 'Status': 0}
+        self.tab_data = {'Eenheid': 0, 'Waarde': 0, 'Status': 0}
 
     def set_connection(self, connection):
         self.__connection = connection
