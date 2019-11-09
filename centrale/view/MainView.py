@@ -137,6 +137,11 @@ class Root(Tk):
             text='Uitrollen', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
             command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_OUT)))
         roll_out_button.grid(row=8, column=1)
+        # TODO make auto button switch unit to auto
+        roll_auto_button = Button(settingsframe,
+            text='Auto', background='#EF5B5B', foreground='white', font='Roboto 11', width=42,
+            command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_IN)))
+        roll_auto_button.grid(row=9, column=0, columnspan=2)
 
         settingsframe.grid(row=0, column=0, sticky='nw')
 
