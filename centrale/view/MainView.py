@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter.ttk import Progressbar
 
 from Enums import Instruction, State
 from view.DataView import DataView
@@ -12,21 +13,46 @@ matplotlib.use('TkAgg')
 class Root(Tk):
     def __init__(self, sharedvar, serialcontroller):
         super(Root, self).__init__()
-        self.title('Centrale')
-        self.minsize(800, 480)
+        self.title('Besturingscentrale')
+        self.minsize(900, 480)
         self.maxsize(900, 480)
+        self.geometry("+{}+{}".format(int(self.winfo_screenwidth() / 2-450), int(self.winfo_screenheight() / 2-240)))
+
+        # Initialize data variables
+        self.serialcontroller = serialcontroller
         self.sharedvar = sharedvar
         self.devices = []
         self.devicedata = {}
 
+        # Initialize Root element grid size
+        self.grid_columnconfigure(0, minsize=650, weight=1)
+        self.grid_columnconfigure(1, minsize=250, weight=1)
+
+        # Styling
+        self.configure(background='#2F4F4F')
+        self.iconbitmap(r'resources/sun.ico')
+        self.loader = Canvas(self, width=900, height=480, highlightthickness=0, background='#2F4F4F')
+        self.loader.grid(column=0, row=0, columnspan=2)
+        self.loading(1)
+
         self.nb = ttk.Notebook(self, name='notebook')
-        self.nb.grid(column=0, row=0)
+        self.data_button = Button(self, text='Data', command=lambda: self.data_button_pressed())
         self.dataview = DataView(self, sharedvar)
 
-        self.data_button = Button(self, text='Data', command=lambda: self.data_button_pressed())
-        self.data_button.grid(column=1, row=0, sticky='ne')
+    # Remove loading
+    def loading(self, stage):
+        self.loader.delete('all')
+        self.loader.create_text(450 - 10, 220, font='Roboto', text='Wachten op connecties' + ('.'*stage), fill='white')
 
-        self.serialcontroller = serialcontroller
+        if len(self.devices) == 0:
+            stage += 1
+            if stage > 3:
+                stage = 1
+            self.after(1000, lambda: self.loading(stage))
+        else:
+            self.loader.destroy()
+            self.nb.grid(column=0, row=0)
+            self.data_button.grid(column=1, row=0, sticky='ne')
 
     # add a tab to the notebook
     def add_tab(self, port, device):
