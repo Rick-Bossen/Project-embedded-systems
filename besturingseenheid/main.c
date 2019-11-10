@@ -83,8 +83,8 @@ void init(){
 	
 	light_open = 50;
 	light_close = 100;
-	temperature_open = 15;
-	temperature_close = 25;
+	temperature_open = 22;
+	temperature_close = 28;
 	
 	// ADC init
 	ADCSRA |= (1<<ADPS2);
