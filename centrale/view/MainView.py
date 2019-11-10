@@ -57,7 +57,8 @@ class Root(Tk):
             loader.grid(column=0, row=0, columnspan=2)
 
         loader.delete('all')
-        loader.create_text(450 - 10, 220, font=Theme.FONT_FAMILY, text='Wachten op connecties' + ('.'*stage), fill=Theme.FONT_COLOR)
+        loader.create_text(450 - 10, 220, font=Theme.FONT_FAMILY, text='Wachten op connecties' + ('.'*stage),
+                           fill=Theme.FONT_COLOR)
 
         if len(self.devices) == 0:
             stage += 1
@@ -184,7 +185,7 @@ class Root(Tk):
         graph = Graph(frame, (4, 3))
         self.devicedata[port]['graph'] = graph
 
-        canvas = graph.getCanvas()
+        canvas = graph.get_canvas()
         canvas._tkcanvas.grid(row=5, column=0, rowspan=8, columnspan=2, sticky='nw', padx=10, pady=10)
 
     # updates a graph with new data

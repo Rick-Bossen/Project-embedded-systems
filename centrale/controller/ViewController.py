@@ -27,7 +27,7 @@ class ViewController:
             if input[device]:
                 print(input[device])
                 self.window.updatetab(device, input[device])
-        self.window.dataview.updateData(input)
+        self.window.dataview.update_data(input)
 
     def data_button_pressed(self):
         self.window.dataview.toggle()

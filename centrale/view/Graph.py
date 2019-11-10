@@ -51,7 +51,7 @@ class Graph:
         self.canvas.draw()
 
     # returns the canvas
-    def getCanvas(self):
+    def get_canvas(self):
         return self.canvas
 
     # updates or adds a static line, supports up to 7 lines

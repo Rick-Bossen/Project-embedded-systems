@@ -15,6 +15,7 @@ class State(IntEnum):
     ROLLING_OUT = 2
     ROLLING_IN = 3
 
+
 @unique
 class ResponseType(IntEnum):
     STATE_INFO = 1

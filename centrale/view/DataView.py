@@ -8,7 +8,7 @@ from view.Graph import Graph
 
 class DataView:
     labels = ('Hoogste temperatuur', 'Laagste temperatuur', 'Gemiddelde temperatuur', 'Hoogste lichtintensiteit',
-                 'Laagste lichtintensiteit', 'Gemiddelde lichtintensiteit', 'Aantal eenheden',
+              'Laagste lichtintensiteit', 'Gemiddelde lichtintensiteit', 'Aantal eenheden',
               'Aantal temperatuursensoren', 'Aantal lichtsensoren', 'Uptime')
 
     def __init__(self, parent):
@@ -103,7 +103,7 @@ class DataView:
         uptimevar = StringVar()
         uptimelab = Label(data_frame, textvar=uptimevar, **Theme.LABEL)
         uptimelab.grid(row=12, column=1, sticky='nw')
-        self.data['uptime']= uptimevar
+        self.data['uptime'] = uptimevar
 
         data_frame.grid(row=0, column=0, rowspan=2, padx=(Theme.PADDING, 0), sticky='nw')
 
@@ -112,12 +112,12 @@ class DataView:
 
         tempgraph = Graph(graph_frame, (4, 3), 'Gemiddelde temperatuur')
         self.data['tempgraph'] = tempgraph
-        tempcanvas = tempgraph.getCanvas()
+        tempcanvas = tempgraph.get_canvas()
         tempcanvas._tkcanvas.grid(row=0, column=0)
 
         lightgraph = Graph(graph_frame, (4, 3), 'Gemiddelde lichtintensiteit')
         self.data['lightgraph'] = lightgraph
-        lightcanvas = lightgraph.getCanvas()
+        lightcanvas = lightgraph.get_canvas()
         lightcanvas._tkcanvas.grid(row=1, column=0)
 
         graph_frame.grid(row=0, column=3)
@@ -136,7 +136,7 @@ class DataView:
         self.data['units'].set(self.data['units'].get() + 1)
 
     # updates the data
-    def updateData(self, data):
+    def update_data(self, data):
         units = 0
         lightunits = 0
         tempunits = 0
