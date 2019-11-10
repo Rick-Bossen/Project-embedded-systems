@@ -23,8 +23,6 @@ class Graph:
         self.lines = {}
 
         self.index = count()
-
-        self.fig.tight_layout()
         self.canvas = FigureCanvasTkAgg(self.fig, master=master)
 
     # adds new value to graph
