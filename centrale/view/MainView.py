@@ -14,6 +14,9 @@ class Root(Tk):
 
     tab_settings = ('Uitrol waarde ', 'Inrol waarde ',)
     tab_data = ('Eenheid', 'Waarde', 'Status')
+    unit_names = {Unit.MANUAL.name: 'Handmatig', Unit.LIGHT.value: 'Licht', Unit.TEMPERATURE.name: 'Temperatuur'}
+    state_names = {State.ROLLED_IN.name: 'Ingerold', State.ROLLING_OUT.name: 'Uitrollen',
+                   State.ROLLED_OUT.name: 'Uitgerold', State.ROLLING_IN.name: 'Inrollen'}
 
     def __init__(self, view_controller):
         super(Root, self).__init__()
@@ -200,7 +203,7 @@ class Root(Tk):
                 if k2 in self.devicedata[device][k] and not k2 == 'light' and not k2 == 'temperature':
                     if k == 'unit' and k2 == 'name':
                         if v2 == Unit.MANUAL.name:
-                            v2 = 'Handmatig'
+                            v2 = self.unit_names[v2]
                             if not self.roll_auto_button.winfo_viewable():
                                 self.roll_auto_button.grid(row=7, column=0, columnspan=2)
                         else:
@@ -210,16 +213,8 @@ class Root(Tk):
                                 v2 = 'Temperatuur'
                             if self.roll_auto_button.winfo_viewable():
                                 self.roll_auto_button.grid_forget()
-
-                    if k == 'state' and k2 == 'name':
-                        if v2 == State.ROLLED_IN.name:
-                            v2 = 'Ingerold'
-                        elif v2 == State.ROLLING_OUT.name:
-                            v2 = 'Uitrollen'
-                        elif v2 == State.ROLLED_OUT.name:
-                            v2 = 'Uitgerold'
-                        elif v2 == State.ROLLING_IN.name:
-                            v2 = 'Inrollen'
+                    elif k == 'state' and k2 == 'name':
+                        v2 = self.state_names[v2]
 
                     self.devicedata[device][k][k2].set(v2)
                 elif k2 == 'light' or k2 == 'temperature':
