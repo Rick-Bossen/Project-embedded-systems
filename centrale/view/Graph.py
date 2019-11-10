@@ -8,6 +8,7 @@ from view.Theme import *
 
 class Graph:
     def __init__(self, master, size, title=""):
+        self.title = title
         plt.style.use('seaborn')
         ax = plt.figure().gca()
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -35,6 +36,7 @@ class Graph:
             self.y_values.pop(0)
 
         self.plot.cla()
+        self.plot.set_title(self.title, color=Theme.FONT_COLOR)
         self.plot.plot(self.x_values, self.y_values, marker='o', color=Theme.HIGHLIGHT_COLOR)
 
         # adds static lines with different colors

@@ -221,6 +221,10 @@ class Root(Tk):
 
                     self.devicedata[device][k][k2].set(v2)
                 elif k2 == 'light' or k2 == 'temperature':
+                    if 'type' not in self.devicedata[device]:
+                        self.devicedata[device]['settings']['roll_in'].set(v2['close_at'])
+                        self.devicedata[device]['settings']['roll_out'].set(v2['open_at'])
+
                     self.devicedata[device]['type'] = k2
 
                     # set action of auto button
