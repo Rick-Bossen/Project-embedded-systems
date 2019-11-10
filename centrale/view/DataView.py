@@ -1,19 +1,20 @@
 from tkinter import *
 import time
 import datetime
+
+from view.Theme import *
 from view.Graph import Graph
 
 
-# TODO add styling
 class DataView:
     labels = ('Hoogste temperatuur', 'Laagste temperatuur', 'Gemiddelde temperatuur', 'Hoogste lichtintensiteit',
-                 'Laagste lichtintensiteit', 'Gemiddelde lichtintensiteit', 'Aantal aangesloten units',
-              'Aantal aangesloten temperatuursensoren', 'Aantal aangesloten lichtsensoren', 'Uptime')
+                 'Laagste lichtintensiteit', 'Gemiddelde lichtintensiteit', 'Aantal units',
+              'Aantal temperatuursensoren', 'Aantal lichtsensoren', 'Uptime')
 
     def __init__(self, parent):
         self.data = {}
         self.starttime = time.time()
-        self.top = Toplevel(parent)
+        self.top = Toplevel(parent, background=Theme.FRAME_COLOR)
         self.top.minsize(600, 460)
         self.top.maxsize(600, 460)
         self.create_main_frame(self.top)
@@ -27,8 +28,8 @@ class DataView:
 
     # creates the main frame in which all the data will be displayed
     def create_main_frame(self, frame):
-        frame = Frame(frame)
-        titlelabel = Label(frame, text='Data')
+        frame = Frame(frame, background=Theme.FRAME_COLOR)
+        titlelabel = Label(frame, text='Data', **Theme.LABEL_HEADER)
         titlelabel.grid(row=0, column=0)
         self.create_statistics_frame(frame)
         self.create_graph_frame(frame)
@@ -37,63 +38,64 @@ class DataView:
 
     # creates the frame within the main frame that contains all the numeric data
     def create_statistics_frame(self, frame):
-        data_frame = Frame(frame)
+        data_frame = Frame(frame, background=Theme.FRAME_COLOR)
+        data_frame.grid_columnconfigure(1, minsize=50)
 
         # creates all the labels
         row = 1
         for label in self.labels:
-            lab = Label(data_frame, text=label + ':')
+            lab = Label(data_frame, text=label + ':', **Theme.LABEL)
             lab.grid(row=row, column=0, sticky='nw')
             row += 1
 
         # creates all the variable labels and variables
         maxtempvar = IntVar()
-        maxtemplab = Label(data_frame, textvar=maxtempvar)
+        maxtemplab = Label(data_frame, textvar=maxtempvar, **Theme.LABEL)
         maxtemplab.grid(row=1, column=1, sticky='nw')
         self.data['maxtemp'] = maxtempvar
 
         mintempvar = IntVar()
-        mintemplab = Label(data_frame, textvar=mintempvar)
+        mintemplab = Label(data_frame, textvar=mintempvar, **Theme.LABEL)
         mintemplab.grid(row=2, column=1, sticky='nw')
         self.data['mintemp'] = mintempvar
 
         avgtempvar = IntVar()
-        avgtemplab = Label(data_frame, textvar=avgtempvar)
+        avgtemplab = Label(data_frame, textvar=avgtempvar, **Theme.LABEL)
         avgtemplab.grid(row=3, column=1, sticky='nw')
         self.data['avgtemp'] = avgtempvar
 
         maxlightvar = IntVar()
-        maxlightlab = Label(data_frame, textvar=maxlightvar)
+        maxlightlab = Label(data_frame, textvar=maxlightvar, **Theme.LABEL)
         maxlightlab.grid(row=4, column=1, sticky='nw')
         self.data['maxlight'] = maxlightvar
 
         minlightvar = IntVar()
-        minlightlab = Label(data_frame, textvar=minlightvar)
+        minlightlab = Label(data_frame, textvar=minlightvar, **Theme.LABEL)
         minlightlab.grid(row=5, column=1, sticky='nw')
         self.data['minlight'] = minlightvar
 
         avglightvar = IntVar()
-        avglightlab = Label(data_frame, textvar=avglightvar)
+        avglightlab = Label(data_frame, textvar=avglightvar, **Theme.LABEL)
         avglightlab.grid(row=6, column=1, sticky='nw')
         self.data['avglight'] = avglightvar
 
         unitsvar = IntVar()
-        unitslab = Label(data_frame, textvar=unitsvar)
+        unitslab = Label(data_frame, textvar=unitsvar, **Theme.LABEL)
         unitslab.grid(row=7, column=1, sticky='nw')
         self.data['units'] = unitsvar
 
         tempunitsvar = IntVar()
-        tempunitslab = Label(data_frame, textvar=tempunitsvar)
+        tempunitslab = Label(data_frame, textvar=tempunitsvar, **Theme.LABEL)
         tempunitslab.grid(row=8, column=1, sticky='nw')
         self.data['tempunits'] = tempunitsvar
 
         lightunitsvar = IntVar()
-        lightunitslab = Label(data_frame, textvar=lightunitsvar)
+        lightunitslab = Label(data_frame, textvar=lightunitsvar, **Theme.LABEL)
         lightunitslab.grid(row=9, column=1, sticky='nw')
         self.data['lightunits'] = lightunitsvar
 
         uptimevar = StringVar()
-        uptimelab = Label(data_frame, textvar=uptimevar)
+        uptimelab = Label(data_frame, textvar=uptimevar, **Theme.LABEL)
         uptimelab.grid(row=10, column=1, sticky='nw')
         self.data['uptime']= uptimevar
 
