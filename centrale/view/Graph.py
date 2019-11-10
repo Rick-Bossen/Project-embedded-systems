@@ -3,15 +3,20 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from itertools import count
 
+from view.Theme import *
+
 
 class Graph:
     def __init__(self, master, size, title=""):
         plt.style.use('seaborn')
         ax = plt.figure().gca()
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        self.fig = plt.Figure(figsize=size)
+
+        self.fig = plt.Figure(figsize=size, dpi=80)
+        self.fig.set_facecolor(Theme.FRAME_COLOR)
         self.plot = self.fig.add_subplot(111)
-        self.plot.set_title(title)
+        self.plot.set_title(title, color=Theme.FONT_COLOR)
+        self.plot.tick_params(colors=Theme.FONT_COLOR)
         self.x_values = []
         self.y_values = []
         self.lines = {}
@@ -30,7 +35,7 @@ class Graph:
             self.y_values.pop(0)
 
         self.plot.cla()
-        self.plot.plot(self.x_values, self.y_values, marker='o')
+        self.plot.plot(self.x_values, self.y_values, marker='o', color=Theme.HIGHLIGHT_COLOR)
 
         # adds static lines with different colors
         if self.lines:

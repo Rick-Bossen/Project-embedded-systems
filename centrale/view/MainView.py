@@ -35,6 +35,7 @@ class Root(Tk):
         self.nb = ttk.Notebook(self, name='notebook', height=Theme.HEIGHT - Theme.PADDING * 4)
         self.data_button = Button(self, text='Data', width=70, command=self.view_controller.data_button_pressed,
                                   **Theme.BUTTON)
+        self.roll_auto_button = None
         self.dataview = DataView(self)
 
         # Styling
@@ -122,9 +123,9 @@ class Root(Tk):
         roll_out_button = Button(settingsframe, text='Uitrollen', width=20, **Theme.BUTTON,
                                  command=lambda: self.view_controller.roll_out_button_pressed(port))
         roll_out_button.grid(row=6, column=1)
-        roll_auto_button = Button(settingsframe, text='Auto', width=45, **Theme.BUTTON)
-        roll_auto_button.grid(row=7, column=0, columnspan=2)
-        self.devicedata[port]['settings']['auto'] = roll_auto_button
+
+        self.roll_auto_button = Button(settingsframe, text='Auto', width=45, **Theme.BUTTON)
+        self.devicedata[port]['settings']['auto'] = self.roll_auto_button
 
         settingsframe.grid(row=0, column=0, sticky='nw')
 
@@ -180,7 +181,7 @@ class Root(Tk):
 
     # creates a graph using the matplotlib package
     def create_graph(self, frame, port):
-        graph = Graph(frame, (3, 2))
+        graph = Graph(frame, (4, 3))
         self.devicedata[port]['graph'] = graph
 
         canvas = graph.getCanvas()
@@ -195,6 +196,29 @@ class Root(Tk):
         for k, v in data.items():
             for k2, v2 in v.items():
                 if k2 in self.devicedata[device][k] and not k2 == 'light' and not k2 == 'temperature':
+                    if k == 'unit' and k2 == 'name':
+                        if v2 == Unit.MANUAL.name:
+                            v2 = 'Handmatig'
+                            if not self.roll_auto_button.winfo_viewable():
+                                self.roll_auto_button.grid(row=7, column=0, columnspan=2)
+                        else:
+                            if v2 == Unit.LIGHT.name:
+                                v2 = 'Licht'
+                            elif v2 == Unit.TEMPERATURE.name:
+                                v2 = 'Temperatuur'
+                            if self.roll_auto_button.winfo_viewable():
+                                self.roll_auto_button.grid_forget()
+
+                    if k == 'state' and k2 == 'name':
+                        if v2 == State.ROLLED_IN.name:
+                            v2 = 'Ingerold'
+                        elif v2 == State.ROLLING_OUT.name:
+                            v2 = 'Uitrollen'
+                        elif v2 == State.ROLLED_OUT.name:
+                            v2 = 'Uitgerold'
+                        elif v2 == State.ROLLING_IN.name:
+                            v2 = 'Inrollen'
+
                     self.devicedata[device][k][k2].set(v2)
                 elif k2 == 'light' or k2 == 'temperature':
                     self.devicedata[device]['type'] = k2

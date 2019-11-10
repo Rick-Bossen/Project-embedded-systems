@@ -15,8 +15,8 @@ class DataView:
         self.data = {}
         self.starttime = time.time()
         self.top = Toplevel(parent, background=Theme.FRAME_COLOR)
-        self.top.minsize(600, 460)
-        self.top.maxsize(600, 460)
+        self.top.minsize(600, 480)
+        self.top.maxsize(600, 480)
         self.create_main_frame(self.top)
         self.firsttimelight = 1
         self.firsttimetemp = 1
@@ -104,12 +104,12 @@ class DataView:
     def create_graph_frame(self, frame):
         graph_frame = Frame(frame)
 
-        tempgraph = Graph(graph_frame, (3, 2), 'Gemiddelde temperatuur')
+        tempgraph = Graph(graph_frame, (4, 3), 'Gemiddelde temperatuur')
         self.data['tempgraph'] = tempgraph
         tempcanvas = tempgraph.getCanvas()
         tempcanvas._tkcanvas.grid(row=0, column=0)
 
-        lightgraph = Graph(graph_frame, (3, 2), 'Gemiddelde lichtintensiteit')
+        lightgraph = Graph(graph_frame, (4, 3), 'Gemiddelde lichtintensiteit')
         self.data['lightgraph'] = lightgraph
         lightcanvas = lightgraph.getCanvas()
         lightcanvas._tkcanvas.grid(row=1, column=0)

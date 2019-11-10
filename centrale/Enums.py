@@ -12,9 +12,8 @@ class Unit(IntEnum):
 class State(IntEnum):
     ROLLED_IN = 0
     ROLLED_OUT = 1
-    ROLLING_IN = 2
-    ROLLING_OUT = 3
-
+    ROLLING_OUT = 2
+    ROLLING_IN = 3
 
 @unique
 class ResponseType(IntEnum):
