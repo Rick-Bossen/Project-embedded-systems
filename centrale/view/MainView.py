@@ -10,6 +10,11 @@ from view.Graph import Graph
 
 
 class Root(Tk):
+
+    tab_settings = ('Handmatig uitrollen', 'Uitrol temperatuur','Uitrol lichtintensiteit',
+                    'Unit voor temperatuursensor', 'Unit voor lichtsensor')
+    tab_data = ('Eenheid', 'Waarde', 'Status')
+
     def __init__(self, sharedvar, serialcontroller):
         super(Root, self).__init__()
         self.title('Besturingscentrale')
@@ -70,14 +75,14 @@ class Root(Tk):
         frame = Frame(self, name=port.lower(), background='#598392')
         self.devices.append(device)
         self.devicedata[port] = {}
-        self.create_settings_frame(frame, device.tab_settings, port)
-        self.create_data_frame(frame, device.tab_data, port)
+        self.create_settings_frame(frame, port)
+        self.create_data_frame(frame, port)
         self.updatedropdowns()
 
         self.nb.add(frame, text=port)
 
     # creates the settings frame within the tab
-    def create_settings_frame(self, frame, tab_settings, port):
+    def create_settings_frame(self, frame, port):
         settingsframe = Frame(frame, name='settings', background='#598392')
         titlelabel = Label(settingsframe, text='Instellingen', background='#598392', foreground='white', font='Roboto 14')
         titlelabel.grid(row=0, column=0, rowspan=2, sticky='nw', padx=10, pady=10)
@@ -90,7 +95,7 @@ class Root(Tk):
 
         # creates all setting labels
         row = 2
-        for label in tab_settings:
+        for label in self.tab_settings:
             lab = Label(settingsframe, text=label + ':', background='#598392', foreground='white', font='Roboto 11')
             lab.grid(row=row, column=0, sticky='nw', padx=10)
             row += 1
@@ -144,7 +149,7 @@ class Root(Tk):
         settingsframe.grid(row=0, column=0, sticky='nw')
 
     # creates the data frame within the tab
-    def create_data_frame(self, frame, tab_data, port):
+    def create_data_frame(self, frame, port):
         dataframe = Frame(frame, name='data', width=390, background='#598392')
         titlelabel = Label(dataframe, text='Data', background='#598392', foreground='white', font='Roboto 14')
         titlelabel.grid(row=0, column=0, rowspan=2, sticky='nw', padx=10, pady=10)
@@ -157,7 +162,7 @@ class Root(Tk):
 
         # creates all data labels
         row = 2
-        for label in tab_data:
+        for label in self.tab_data:
             lab = Label(dataframe, text=label + ':', background='#598392', foreground='white', font='Roboto 11')
             lab.grid(row=row, column=0, sticky='nw', padx=10)
             row += 1
@@ -250,6 +255,9 @@ class Root(Tk):
             for port in self.devicedata:
                 temp['unit_temp']['menu'].add_command(label=port)
                 temp['unit_light']['menu'].add_command(label=port)
+
+    def updatesettings(self):
+        pass
 
     # updates the data view with new data
     def updatedataview(self, data):

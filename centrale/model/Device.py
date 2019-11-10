@@ -9,12 +9,6 @@ class Device:
         self.__control = Unit.MANUAL
         self.__control_range = {}
 
-        # TODO remove dictionaries and move strings for gui to a better location
-        self.tab_settings = {'Handmatig uitrollen': 0, 'Uitrol temperatuur': float(20),
-                             'Uitrol lichtintensiteit': 7, 'Unit voor temperatuursensor': 'unit 2',
-                             'Unit voor lichtsensor': 'unit 2'}
-        self.tab_data = {'Eenheid': 0, 'Waarde': 0, 'Status': 0}
-
     def set_connection(self, connection):
         self.__connection = connection
 
