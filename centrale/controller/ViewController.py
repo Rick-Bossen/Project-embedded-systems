@@ -2,7 +2,7 @@ from _tkinter import TclError
 
 from Enums import Instruction, Unit, State
 
-
+# class that represents the controller for the main and data view
 class ViewController:
 
     def __init__(self, serial_controller):
@@ -29,9 +29,11 @@ class ViewController:
                 self.window.updatetab(device, input[device])
         self.window.dataview.updateData(input)
 
+    # toggles the visibility of the data view
     def data_button_pressed(self):
         self.window.dataview.toggle()
 
+    # saves the settings in the entry fields to the device
     def save_settings_button_pressed(self, device):
         try:
             roll_in = self.window.devicedata[device]['settings']['roll_in'].get()
@@ -46,11 +48,14 @@ class ViewController:
             instruction = Instruction.SET_UNIT_RANGE.build(Unit.TEMPERATURE, roll_out, roll_in)
             self.serial_controller.output_instruction(device, instruction)
 
+    # makes the specified device roll in
     def roll_in_button_pressed(self, device):
         self.serial_controller.output_instruction(device, Instruction.ROLL.build(State.ROLLED_IN))
 
+    # makes the specified device roll out
     def roll_out_button_pressed(self, device):
         self.serial_controller.output_instruction(device, Instruction.ROLL.build(State.ROLLED_OUT))
 
+    # makes the specified device roll in or out automatically
     def roll_auto_button_pressed(self, device, unit):
         self.serial_controller.output_instruction(device, Instruction.SET_UNIT.build(unit))

@@ -1,12 +1,14 @@
 from Enums import *
 
 
+# class that decodes data from devices
 class Response:
 
     def __init__(self, response):
         self.raw_response = response
         self.decoded_response = False
 
+    # decodes the live data from devices
     def decode(self):
         bytes = [b for b in self.raw_response]
 
