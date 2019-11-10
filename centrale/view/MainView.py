@@ -4,15 +4,12 @@ from tkinter.ttk import Style
 
 from Enums import Instruction, State, Unit
 from view.DataView import DataView
-
-# TODO make use of settings
 from view.Graph import Graph
 
 
 class Root(Tk):
 
-    tab_settings = ('Handmatig uitrollen', 'Uitrol temperatuur','Uitrol lichtintensiteit',
-                    'Unit voor temperatuursensor', 'Unit voor lichtsensor')
+    tab_settings = ('Uitrol waarde ', 'Inrol waarde ',)
     tab_data = ('Eenheid', 'Waarde', 'Status')
 
     def __init__(self, sharedvar, serialcontroller):
@@ -77,7 +74,6 @@ class Root(Tk):
         self.devicedata[port] = {}
         self.create_settings_frame(frame, port)
         self.create_data_frame(frame, port)
-        self.updatedropdowns()
 
         self.nb.add(frame, text=port)
 
@@ -101,49 +97,34 @@ class Root(Tk):
             row += 1
 
         # creates all the setting modifiers
-        # TODO create toggle button
         self.devicedata[port]['settings'] = {}
-        unit_temp_var = StringVar(settingsframe)
-        unit_temp_var.set(port)
-        self.devicedata[port]['settings']['unit_temp_var'] = unit_temp_var
-        unit_light_var = StringVar(settingsframe)
-        unit_light_var.set(port)
-        self.devicedata[port]['settings']['unit_light_var'] = unit_light_var
 
-        placeholder_button = Label(settingsframe, text='placeholder')
-        placeholder_button.grid(row=2, column=1)
+        roll_out_var = IntVar(settingsframe)
+        roll_out = Entry(settingsframe, textvar=roll_out_var)
+        self.devicedata[port]['settings']['roll_out'] = roll_out_var
+        roll_out.grid(row=2, column=1)
 
-        toggle_temp_var = IntVar()
-        toggle_temp_var.set(20)
-        toggle_temp = Entry(settingsframe, textvar=toggle_temp_var)
-        self.devicedata[port]['settings']['toggle_temp'] = toggle_temp_var
-        toggle_temp.grid(row=3, column=1)
+        roll_in_var = IntVar(settingsframe)
+        roll_in = Entry(settingsframe, textvar=roll_in_var)
+        self.devicedata[port]['settings']['roll_in'] = roll_in_var
+        roll_in.grid(row=3, column=1)
 
-        toggle_light_var = IntVar()
-        toggle_light_var.set(20)
-        toggle_light = Entry(settingsframe, textvar=toggle_light_var)
-        self.devicedata[port]['settings']['toggle_light'] = toggle_light_var
-        toggle_light.grid(row=4, column=1)
-
-        unit_temp = OptionMenu(settingsframe, unit_temp_var, *self.devicedata)
-        self.devicedata[port]['settings']['unit_temp'] = unit_temp
-        unit_temp.grid(row=5, column=1)
-
-        unit_light = OptionMenu(settingsframe, unit_light_var, *self.devicedata)
-        self.devicedata[port]['settings']['unit_light'] = unit_light
-        unit_light.grid(row=6, column=1)
+        save_settings_button = Button(settingsframe,
+            text='Opslaan', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
+            command=lambda: self.applysettings(port))
+        save_settings_button.grid(row=4, column=1)
 
         roll_in_button = Button(settingsframe,
             text='Inrollen', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
             command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_IN)))
-        roll_in_button.grid(row=8, column=0)
+        roll_in_button.grid(row=5, column=0)
         roll_out_button = Button(settingsframe,
             text='Uitrollen', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
             command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_OUT)))
-        roll_out_button.grid(row=8, column=1)
+        roll_out_button.grid(row=5, column=1)
         roll_auto_button = Button(settingsframe, text='Auto', background='#EF5B5B', foreground='white',
                                   font='Roboto 11', width=42)
-        roll_auto_button.grid(row=9, column=0, columnspan=2)
+        roll_auto_button.grid(row=6, column=0, columnspan=2)
         self.devicedata[port]['settings']['auto'] = roll_auto_button
 
         settingsframe.grid(row=0, column=0, sticky='nw')
@@ -204,7 +185,7 @@ class Root(Tk):
 
     # creates a graph using the matplotlib package
     def create_graph(self, frame, port):
-        graph = Graph(frame, (3, 2), )
+        graph = Graph(frame, (3, 2))
         self.devicedata[port]['graph'] = graph
 
         canvas = graph.getCanvas()
@@ -231,6 +212,7 @@ class Root(Tk):
                 if k2 in self.devicedata[device][k] and not k2 == 'light' and not k2 == 'temperature':
                     self.devicedata[device][k][k2].set(v2)
                 elif k2 == 'light' or k2 == 'temperature':
+                    self.devicedata[device]['type'] = k2
                     if k2 == 'light':
                         self.devicedata[device]['settings']['auto']['command'] = \
                             lambda: self.serialcontroller.output_instruction(device,
@@ -245,19 +227,16 @@ class Root(Tk):
                     self.devicedata[device]['graph'].updateline('Rol in', v2['close_at'])
                     self.devicedata[device]['graph'].updateline('Rol uit', v2['open_at'])
 
-    # updates the drop down menu's of all tabs
-    def updatedropdowns(self):
-        for device in self.devicedata:
-            print(device)
-            temp = self.devicedata[device]['settings']
-            temp['unit_temp']['menu'].delete(0, 'end')
-            temp['unit_light']['menu'].delete(0, 'end')
-            for port in self.devicedata:
-                temp['unit_temp']['menu'].add_command(label=port)
-                temp['unit_light']['menu'].add_command(label=port)
-
-    def updatesettings(self):
-        pass
+    def applysettings(self, port):
+        print('LFASDFJMKASDJFKLSDJFKLSDJFKLSJFO(WIEFJSLKDFVNSEOGIJ')
+        roll_in = self.devicedata[port]['settings']['roll_in'].get()
+        roll_out = self.devicedata[port]['settings']['roll_out'].get()
+        if self.devicedata[port]['type'] == 'light':
+            self.serialcontroller.output_instruction(port, Instruction.SET_UNIT_RANGE.build(Unit.LIGHT, roll_out,
+                                                                                            roll_in))
+        elif self.devicedata[port]['type'] == 'temperature':
+            self.serialcontroller.output_instruction(port, Instruction.SET_UNIT_RANGE.build(Unit.TEMPERATURE, roll_out,
+                                                                                            roll_in))
 
     # updates the data view with new data
     def updatedataview(self, data):
