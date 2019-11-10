@@ -6,10 +6,12 @@
 #include "sensors.h"
 #include "scheduler.h"
 
+// Instruction In: Set unit
 void set_unit(uint8_t unit){
 	current_unit = unit;
 }
 
+// Instruction In: Set unit's open/close values
 void set_unit_range(uint8_t unit, uint8_t open, uint8_t close){
 	if(unit == TEMPERATURE){
 		temperature_open = open;
@@ -20,6 +22,7 @@ void set_unit_range(uint8_t unit, uint8_t open, uint8_t close){
 	}
 }
 
+// Route the received instruction to the right function
 void route_instruction(){
 	if(has_input()){
 		uint8_t input = receive();
@@ -41,6 +44,7 @@ void route_instruction(){
 	}
 }
 
+// Instruction out: Sends unit's open/close and current values
 void transmit_unit_values(char unit, uint8_t open_at, uint8_t close_at, uint8_t current_value){
 	transmit((UNIT_VALUE_INFO << 4)|unit);
 	transmit(open_at);
@@ -48,6 +52,7 @@ void transmit_unit_values(char unit, uint8_t open_at, uint8_t close_at, uint8_t 
 	transmit(current_value);
 }
 
+// Instruction out: Sends all info about the control unit
 void transmit_status(){	
 	// Status: Opened, Closed, Expanding, Collapsing (2 bits min.)
 	transmit((STATE_INFO << 4)|current_status);
@@ -95,10 +100,10 @@ void init(){
 	// Scheduler
 	SCH_Init_T1();
 	SCH_Add_Task(route_instruction, 0, 5); // Check every 50ms for input
-	SCH_Add_Task(transmit_status, 0, 600); // Send status every 60s
+	SCH_Add_Task(transmit_status, 0, 6000); // Send status every 60s
 	SCH_Add_Task(check_sunblind_position, 0, 50); // Checking state every 500ms
-	SCH_Add_Task(check_temperature, 0, 400); // Checking state every 40s
-	SCH_Add_Task(check_light, 0, 300); // Checking state every 30s
+	SCH_Add_Task(check_temperature, 0, 4000); // Checking state every 40s
+	SCH_Add_Task(check_light, 0, 3000); // Checking state every 30s
 	SCH_Start();
 }
 

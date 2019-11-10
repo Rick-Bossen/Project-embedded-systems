@@ -5,6 +5,7 @@
 #include "sunblind.h"
 #include "uart.h"
 
+// Return the distance of the ultrasonic sensor.
 uint8_t measure_distance(){
 	uint8_t distance_cm = 0;
 	PIND = 0x00;
@@ -23,6 +24,8 @@ uint8_t measure_distance(){
 	return distance_cm;
 }
 
+// Scheduler function: Check the position of the sunblinds
+// and store it in the global variables current_distance and current_status
 void check_sunblind_position(){
 	uint8_t distance = measure_distance();
 	uint8_t control_distance = measure_distance();
@@ -40,6 +43,7 @@ void check_sunblind_position(){
 	set_leds();
 }
 
+// Instruction In: Set the current status based on the direction requested
 void roll(char direction){
 	if(direction == CLOSED && current_status == OPENED){
 		current_status = COLLAPSING;
@@ -49,6 +53,8 @@ void roll(char direction){
 }
 
 
+// Set the LEDs based on the current status
+// Closed = Red, Open = Green, Opening = Green and blinking Yellow, Closing = Red and blinking Yellow
 void set_leds(){
 	if(current_status == OPENED || current_status == EXPANDING){
 		PORTB |= LED_GREEN;

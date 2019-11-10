@@ -11,6 +11,7 @@ uint16_t read_adc(uint8_t channel)
 	return ADCW;
 }
 
+// Scheduler function: Sets the current temperature in the global current_temperature value
 void check_temperature(){
 	float voltage = read_adc(TEMPERATURE_PIN) * 5.0 / 1023.0;
 	uint8_t temperature = (uint8_t)((voltage - 0.5) * 100);
@@ -31,6 +32,7 @@ void check_temperature(){
 	}
 }
 
+// Scheduler function: Sets the current light in the global current_light value
 void check_light(){
 	uint16_t ADC_VALUE = read_adc(LIGHT_PIN);
 	uint8_t light = (uint8_t) (ADC_VALUE / 4); // 10 bits to max. 8 bits
