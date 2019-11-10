@@ -1,15 +1,9 @@
-from model.Device import Device
 from view.MainView import Root
-from model.SharedVars import SharedVar
 from controller.SerialController import SerialController
-from controller.ViewController import ViewController
 
 serialcontroller = SerialController()
 
-sharedvar = SharedVar()
-window = Root(sharedvar, serialcontroller)
-sharedvar.initvars(window)
-viewcontroller = ViewController(window, sharedvar)
+window = Root(serialcontroller)
 
 
 # checks for new devices

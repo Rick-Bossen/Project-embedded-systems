@@ -5,12 +5,13 @@ from itertools import count
 
 
 class Graph:
-    def __init__(self, master, size):
+    def __init__(self, master, size, title=""):
         plt.style.use('seaborn')
         ax = plt.figure().gca()
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         self.fig = plt.Figure(figsize=size)
         self.plot = self.fig.add_subplot(111)
+        self.plot.set_title(title)
         self.x_values = []
         self.y_values = []
         self.lines = {}
@@ -31,6 +32,7 @@ class Graph:
         self.plot.cla()
         self.plot.plot(self.x_values, self.y_values, marker='o')
 
+        # adds static lines with different colors
         if self.lines:
             colors = ('rgcmykb')
             i = 0

@@ -12,7 +12,7 @@ class Root(Tk):
     tab_settings = ('Uitrol waarde ', 'Inrol waarde ',)
     tab_data = ('Eenheid', 'Waarde', 'Status')
 
-    def __init__(self, sharedvar, serialcontroller):
+    def __init__(self, serialcontroller):
         super(Root, self).__init__()
         self.title('Besturingscentrale')
         self.minsize(900, 480)
@@ -21,7 +21,6 @@ class Root(Tk):
 
         # Initialize data variables
         self.serialcontroller = serialcontroller
-        self.sharedvar = sharedvar
         self.devices = []
         self.devicedata = {}
 
@@ -32,7 +31,7 @@ class Root(Tk):
         self.nb = ttk.Notebook(self, name='notebook', height=440)
         self.data_button = Button(self, text='Data', background='#EF5B5B', foreground='white', font='Roboto 11',
                                   width=70, command=lambda: self.data_button_pressed())
-        self.dataview = DataView(self, sharedvar)
+        self.dataview = DataView(self)
 
         # Styling
         self.configure(background='#2F4F4F')
@@ -191,6 +190,7 @@ class Root(Tk):
         canvas = graph.getCanvas()
         canvas._tkcanvas.grid(row=5, column=0, rowspan=8, columnspan=2, sticky='nw', padx=10, pady=10)
 
+    # updates a graph with new data
     def updategraph(self, port, data):
         self.devicedata[port]['graph'].iterate(data)
 
@@ -213,6 +213,8 @@ class Root(Tk):
                     self.devicedata[device][k][k2].set(v2)
                 elif k2 == 'light' or k2 == 'temperature':
                     self.devicedata[device]['type'] = k2
+
+                    # set action of auto button
                     if k2 == 'light':
                         self.devicedata[device]['settings']['auto']['command'] = \
                             lambda: self.serialcontroller.output_instruction(device,
@@ -222,13 +224,15 @@ class Root(Tk):
                             lambda: self.serialcontroller.output_instruction(device,
                                                                              Instruction.SET_UNIT.build(Unit.TEMPERATURE))
 
-                    self.devicedata[device][k][k2].set(v2['current'])
-                    self.updategraph(device, v2['current'])
-                    self.devicedata[device]['graph'].updateline('Rol in', v2['close_at'])
-                    self.devicedata[device]['graph'].updateline('Rol uit', v2['open_at'])
+                    # check if temperature is a normal reading
+                    if v2['current'] < 100 or k2 == 'light':
+                        self.devicedata[device][k][k2].set(v2['current'])
+                        self.updategraph(device, v2['current'])
+                        self.devicedata[device]['graph'].updateline('Rol in', v2['close_at'])
+                        self.devicedata[device]['graph'].updateline('Rol uit', v2['open_at'])
 
+    # applies the given settings to the unit
     def applysettings(self, port):
-        print('LFASDFJMKASDJFKLSDJFKLSDJFKLSJFO(WIEFJSLKDFVNSEOGIJ')
         roll_in = self.devicedata[port]['settings']['roll_in'].get()
         roll_out = self.devicedata[port]['settings']['roll_out'].get()
         if self.devicedata[port]['type'] == 'light':

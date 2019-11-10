@@ -1,16 +1,24 @@
 from tkinter import *
 import time
 import datetime
+from view.Graph import Graph
 
 
-# TODO add live data and graphs to view
+# TODO add styling
 class DataView:
-    def __init__(self, parent, sharedvars):
-        self.sharedvars = sharedvars
+    labels = ('Hoogste temperatuur', 'Laagste temperatuur', 'Gemiddelde temperatuur', 'Hoogste lichtintensiteit',
+                 'Laagste lichtintensiteit', 'Gemiddelde lichtintensiteit', 'Aantal aangesloten units',
+              'Aantal aangesloten temperatuursensoren', 'Aantal aangesloten lichtsensoren', 'Uptime')
+
+    def __init__(self, parent):
         self.data = {}
         self.starttime = time.time()
         self.top = Toplevel(parent)
+        self.top.minsize(600, 460)
+        self.top.maxsize(600, 460)
         self.create_main_frame(self.top)
+        self.firsttimelight = 1
+        self.firsttimetemp = 1
 
         self.top.withdraw()
         self.visible = 0
@@ -23,6 +31,7 @@ class DataView:
         titlelabel = Label(frame, text='Data')
         titlelabel.grid(row=0, column=0)
         self.create_statistics_frame(frame)
+        self.create_graph_frame(frame)
 
         frame.grid(row=0, column=0)
 
@@ -32,7 +41,7 @@ class DataView:
 
         # creates all the labels
         row = 1
-        for label in self.sharedvars.data:
+        for label in self.labels:
             lab = Label(data_frame, text=label + ':')
             lab.grid(row=row, column=0, sticky='nw')
             row += 1
@@ -90,9 +99,20 @@ class DataView:
 
         data_frame.grid(row=1, column=0, rowspan=2)
 
-    # TODO add graphs to frame
-    def create_graph_frame(self):
-        pass
+    def create_graph_frame(self, frame):
+        graph_frame = Frame(frame)
+
+        tempgraph = Graph(graph_frame, (3, 2), 'Gemiddelde temperatuur')
+        self.data['tempgraph'] = tempgraph
+        tempcanvas = tempgraph.getCanvas()
+        tempcanvas._tkcanvas.grid(row=0, column=0)
+
+        lightgraph = Graph(graph_frame, (3, 2), 'Gemiddelde lichtintensiteit')
+        self.data['lightgraph'] = lightgraph
+        lightcanvas = lightgraph.getCanvas()
+        lightcanvas._tkcanvas.grid(row=1, column=0)
+
+        graph_frame.grid(row=1, column=3)
 
     # toggles the visibility of the data window
     def toggle(self):
@@ -112,6 +132,8 @@ class DataView:
         units = 0
         lightunits = 0
         tempunits = 0
+        lightvals = []
+        tempvals = []
         for device in data:
             if data[device]:
                 units += 1
@@ -120,19 +142,37 @@ class DataView:
                     unit = temp['unit']
                     if not unit['name'] == 'MANUAL':
                         unit_values = temp['unit_values'][unit['name'].lower()]
+                        current = unit_values['current']
                         if unit['name'] == 'LIGHT':
                             lightunits += 1
-                            if self.data['maxlight'].get() < unit_values['current']:
-                                self.data['maxlight'].set(unit_values['current'])
-                            if self.data['minlight'].get() > unit_values['current']:
-                                self.data['minlight'].set(unit_values['current'])
+                            if self.data['maxlight'].get() < current:
+                                self.data['maxlight'].set(current)
+                                self.data['lightgraph'].updateline('Hoogste lichtintensiteit', current)
+                            if self.data['minlight'].get() > current:
+                                self.data['minlight'].set(current)
+                                self.data['lightgraph'].updateline('Laagste lichtintensiteit', current)
+                            lightvals.append(current)
+                            self.firsttimeset('light', current)
                         elif unit['name'] == 'TEMPERATURE':
                             tempunits += 1
-                            if self.data['maxtemp'].get() < unit_values['current']:
-                                self.data['maxtemp'].set(unit_values['current'])
-                            if self.data['mintemp'].get() > unit_values['current']:
-                                self.data['mintemp'].set(unit_values['current'])
+                            if self.data['maxtemp'].get() < current < 100:
+                                self.data['maxtemp'].set(current)
+                                self.data['tempgraph'].updateline('Hoogste temperatuur', current)
+                            if self.data['mintemp'].get() > current:
+                                self.data['mintemp'].set(current)
+                                self.data['tempgraph'].updateline('Laagste temperatuur', current)
+                            tempvals.append(current)
+                            self.firsttimeset('temperature', current)
+        if tempvals:
+            avgtemp = round(sum(tempvals) / len(tempvals), 2)
+            if avgtemp < 100:
+                self.data['avgtemp'].set(avgtemp)
+                self.data['tempgraph'].iterate(avgtemp)
 
+        if lightvals:
+            avglight = round(sum(lightvals) / len(lightvals), 2)
+            self.data['avglight'].set(avglight)
+            self.data['lightgraph'].iterate(avglight)
         uptime = datetime.timedelta(seconds=time.time() - self.starttime)
         uptime = uptime - datetime.timedelta(microseconds=uptime.microseconds)
         self.data['uptime'].set(str(uptime))
@@ -140,3 +180,17 @@ class DataView:
         self.data['units'].set(units)
         self.data['lightunits'].set(lightunits)
         self.data['tempunits'].set(tempunits)
+
+    def updategraphs(self):
+        pass
+
+    # sets the min values with the first given values instead of 0
+    def firsttimeset(self, type, value):
+        if type == 'light':
+            if self.firsttimelight:
+                self.firsttimelight = 0
+                self.data['minlight'].set(value)
+        elif type == 'temperature':
+            if self.firsttimetemp:
+                self.firsttimetemp = 0
+                self.data['mintemp'].set(value)
