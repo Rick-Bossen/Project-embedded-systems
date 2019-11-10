@@ -1,33 +1,13 @@
-from view.MainView import Root
 from controller.SerialController import SerialController
+from controller.ViewController import ViewController
+from view.MainView import Root
 
-serialcontroller = SerialController()
+serial_controller = SerialController()
+view_controller = ViewController(serial_controller)
+window = Root(view_controller)
 
-window = Root(serialcontroller)
+view_controller.window = window
+window.interval(1000, view_controller.check_devices)
+window.interval(6000, view_controller.update_view)
 
-
-# checks for new devices
-def checkdevices():
-    devices = serialcontroller.find_devices()
-    for device in devices:
-        try:
-            window.nametowidget(device.lower())
-        except KeyError:
-            window.add_tab(device, devices[device])
-    serialcontroller.check_connections()
-
-
-# updates the view with new data
-def updateview():
-    serialcontroller.check_connections()
-    input = serialcontroller.read_input()
-    for device in input:
-        if input[device]:
-            print(input[device])
-            window.updatetab(device, input[device])
-    window.updatedataview(input)
-
-
-window.interval(1000, checkdevices)
-window.interval(6000, updateview)
 window.mainloop()

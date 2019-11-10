@@ -3,8 +3,10 @@ from tkinter import ttk
 from tkinter.ttk import Style
 
 from Enums import Instruction, State, Unit
+from view.Theme import *
 from view.DataView import DataView
 from view.Graph import Graph
+from controller.ViewController import *
 
 
 class Root(Tk):
@@ -12,58 +14,60 @@ class Root(Tk):
     tab_settings = ('Uitrol waarde ', 'Inrol waarde ',)
     tab_data = ('Eenheid', 'Waarde', 'Status')
 
-    def __init__(self, serialcontroller):
+    def __init__(self, view_controller):
         super(Root, self).__init__()
-        self.title('Besturingscentrale')
-        self.minsize(900, 480)
-        self.maxsize(900, 480)
-        self.geometry("+{}+{}".format(int(self.winfo_screenwidth() / 2-450), int(self.winfo_screenheight() / 2-240)))
-
-        # Initialize data variables
-        self.serialcontroller = serialcontroller
         self.devices = []
         self.devicedata = {}
+        self.view_controller = view_controller
+
+        self.title('Besturingscentrale')
+        self.minsize(*Theme.SIZE)
+        self.maxsize(*Theme.SIZE)
+        self.geometry("+{}+{}".format(
+            int(self.winfo_screenwidth() / 2 - Theme.WIDTH / 2),
+            int(self.winfo_screenheight() / 2 - Theme.HEIGHT / 2))
+        )
 
         # Initialize Root element grid size
-        self.grid_columnconfigure(0, minsize=800, weight=1)
-        self.grid_columnconfigure(1, minsize=100, weight=1)
+        self.grid_columnconfigure(0, minsize=Theme.TK_NB_WIDTH, weight=1)
+        self.grid_columnconfigure(1, minsize=Theme.TK_DATA_BUTTON_WIDTH, weight=1)
 
-        self.nb = ttk.Notebook(self, name='notebook', height=440)
-        self.data_button = Button(self, text='Data', background='#EF5B5B', foreground='white', font='Roboto 11',
-                                  width=70, command=lambda: self.data_button_pressed())
+        self.nb = ttk.Notebook(self, name='notebook', height=Theme.HEIGHT - Theme.PADDING * 4)
+        self.data_button = Button(self, text='Data', width=70, command=self.view_controller.data_button_pressed,
+                                  **Theme.BUTTON)
         self.dataview = DataView(self)
 
         # Styling
-        self.configure(background='#2F4F4F')
-        self.iconbitmap(r'resources/sun.ico')
+        self.configure(background=Theme.BACKGROUND_COLOR)
+        self.iconbitmap(Theme.R_ICO)
+        Theme.init()
+        # Initialize loading animation
+        self.loading_text()
 
-        style = Style()
-        style.theme_create('notebook', settings={
-            "TNotebook": {"configure": {"background": "#2F4F4F"}},
-            "TNotebook.Tab": {
-                "configure": {"padding": [5, 1], "background": "#AEC3B0", 'foreground': '#fff'},
-                "map": {"background": [("selected", "#598392")], "foreground": [("selected", "#fff"), ("active", "#EF5B5B")]}
-            }
-        })
-        style.theme_use('notebook')
-        self.loader = Canvas(self, width=900, height=480, highlightthickness=0, background='#2F4F4F')
-        self.loader.grid(column=0, row=0, columnspan=2)
-        self.loading(1)
+    # used to run a function in a specified interval
+    def interval(self, speed, function):
+        self.after(speed, lambda: [self.interval(speed, function), function()])
 
     # Remove loading
-    def loading(self, stage):
-        self.loader.delete('all')
-        self.loader.create_text(450 - 10, 220, font='Roboto', text='Wachten op connecties' + ('.'*stage), fill='white')
+    def loading_text(self, stage=1, loader=None):
+        if loader is None:
+            loader = Canvas(self, width=Theme.WIDTH, height=Theme.HEIGHT, highlightthickness=0,
+                            background=Theme.BACKGROUND_COLOR)
+            loader.grid(column=0, row=0, columnspan=2)
+
+        loader.delete('all')
+        loader.create_text(450 - 10, 220, font=Theme.FONT_FAMILY, text='Wachten op connecties' + ('.'*stage), fill=Theme.FONT_COLOR)
 
         if len(self.devices) == 0:
             stage += 1
             if stage > 3:
                 stage = 1
-            self.after(1000, lambda: self.loading(stage))
+            self.after(1000, lambda: self.loading_text(stage, loader))
         else:
-            self.loader.destroy()
-            self.nb.grid(column=0, row=0, padx=(10, 0), pady=(10, 10))
-            self.data_button.grid(column=1, row=0, sticky='ne', padx=(10, 10), pady=(30, 10))
+            loader.destroy()
+            self.nb.grid(column=0, row=0, padx=(Theme.PADDING, 0), pady=Theme.PADDING)
+            self.data_button.grid(column=1, row=0, sticky='ne', padx=Theme.PADDING,
+                                  pady=(Theme.PADDING * 3, Theme.PADDING))
 
     # add a tab to the notebook
     def add_tab(self, port, device):
@@ -78,90 +82,86 @@ class Root(Tk):
 
     # creates the settings frame within the tab
     def create_settings_frame(self, frame, port):
-        settingsframe = Frame(frame, name='settings', background='#598392')
-        titlelabel = Label(settingsframe, text='Instellingen', background='#598392', foreground='white', font='Roboto 14')
-        titlelabel.grid(row=0, column=0, rowspan=2, sticky='nw', padx=10, pady=10)
+        settingsframe = Frame(frame, name='settings', background=Theme.FRAME_COLOR)
+        titlelabel = Label(settingsframe, text='Instellingen', **Theme.LABEL_HEADER)
+        titlelabel.grid(row=0, column=0, rowspan=2, sticky='nw', padx=Theme.PADDING, pady=Theme.PADDING)
 
         # Configure grid sizes
         for i in range(0, 13):
-            settingsframe.grid_rowconfigure(i, minsize=34)
+            settingsframe.grid_rowconfigure(i, minsize=Theme.ROW_HEIGHT)
         for i in range(0, 2):
-            settingsframe.grid_columnconfigure(i, minsize=195)
+            settingsframe.grid_columnconfigure(i, minsize=Theme.COLUMN_WIDTH)
 
         # creates all setting labels
         row = 2
         for label in self.tab_settings:
-            lab = Label(settingsframe, text=label + ':', background='#598392', foreground='white', font='Roboto 11')
-            lab.grid(row=row, column=0, sticky='nw', padx=10)
+            lab = Label(settingsframe, text=label + ':', **Theme.LABEL)
+            lab.grid(row=row, column=0, sticky='nw', padx=Theme.PADDING)
             row += 1
 
         # creates all the setting modifiers
         self.devicedata[port]['settings'] = {}
 
         roll_out_var = IntVar(settingsframe)
-        roll_out = Entry(settingsframe, textvar=roll_out_var)
+        roll_out = Entry(settingsframe, textvar=roll_out_var, font=Theme.FONT)
         self.devicedata[port]['settings']['roll_out'] = roll_out_var
         roll_out.grid(row=2, column=1)
 
         roll_in_var = IntVar(settingsframe)
-        roll_in = Entry(settingsframe, textvar=roll_in_var)
+        roll_in = Entry(settingsframe, textvar=roll_in_var, font=Theme.FONT)
         self.devicedata[port]['settings']['roll_in'] = roll_in_var
         roll_in.grid(row=3, column=1)
 
-        save_settings_button = Button(settingsframe,
-            text='Opslaan', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
-            command=lambda: self.applysettings(port))
+        save_settings_button = Button(settingsframe, text='Opslaan', width=20, **Theme.BUTTON,
+                                      command=lambda: self.view_controller.save_settings_button_pressed(port))
         save_settings_button.grid(row=4, column=1)
 
-        roll_in_button = Button(settingsframe,
-            text='Inrollen', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
-            command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_IN)))
-        roll_in_button.grid(row=5, column=0)
-        roll_out_button = Button(settingsframe,
-            text='Uitrollen', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
-            command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_OUT)))
-        roll_out_button.grid(row=5, column=1)
-        roll_auto_button = Button(settingsframe, text='Auto', background='#EF5B5B', foreground='white',
-                                  font='Roboto 11', width=42)
-        roll_auto_button.grid(row=6, column=0, columnspan=2)
+        roll_in_button = Button(settingsframe, text='Inrollen',  width=20, **Theme.BUTTON,
+                                command=lambda: self.view_controller.roll_in_button_pressed(port))
+        roll_in_button.grid(row=6, column=0)
+        roll_out_button = Button(settingsframe, text='Uitrollen', width=20, **Theme.BUTTON,
+                                 command=lambda: self.view_controller.roll_out_button_pressed(port))
+        roll_out_button.grid(row=6, column=1)
+        roll_auto_button = Button(settingsframe, text='Auto', width=45, **Theme.BUTTON)
+        roll_auto_button.grid(row=7, column=0, columnspan=2)
         self.devicedata[port]['settings']['auto'] = roll_auto_button
 
         settingsframe.grid(row=0, column=0, sticky='nw')
 
     # creates the data frame within the tab
     def create_data_frame(self, frame, port):
-        dataframe = Frame(frame, name='data', width=390, background='#598392')
-        titlelabel = Label(dataframe, text='Data', background='#598392', foreground='white', font='Roboto 14')
-        titlelabel.grid(row=0, column=0, rowspan=2, sticky='nw', padx=10, pady=10)
+        dataframe = Frame(frame, name='data', width=390, background=Theme.FRAME_COLOR)
+        titlelabel = Label(dataframe, text='Data', **Theme.LABEL_HEADER)
+        titlelabel.grid(row=0, column=0, rowspan=2, sticky='nw', padx=Theme.PADDING, pady=Theme.PADDING)
 
         # Configure grid sizes
         for i in range(0, 13):
-            dataframe.grid_rowconfigure(i, minsize=34)
+            dataframe.grid_rowconfigure(i, minsize=Theme.ROW_HEIGHT)
         for i in range(0, 2):
-            dataframe.grid_columnconfigure(i, minsize=195)
+            dataframe.grid_columnconfigure(i, minsize=Theme.COLUMN_WIDTH)
 
         # creates all data labels
         row = 2
         for label in self.tab_data:
-            lab = Label(dataframe, text=label + ':', background='#598392', foreground='white', font='Roboto 11')
+            lab = Label(dataframe, text=label + ':', **Theme.LABEL)
             lab.grid(row=row, column=0, sticky='nw', padx=10)
             row += 1
 
         unitvar = StringVar()
         unitvar.set('-')
-        unitlab = Label(dataframe, textvar=unitvar, background='#598392', foreground='white', font='Roboto 11')
+        unitlab = Label(dataframe, textvar=unitvar, **Theme.LABEL)
         unitlab.grid(row=2, column=1, sticky='nw')
         self.devicedata[port]['unit'] = {'name': unitvar}
 
         self.devicedata[port]['unit_values'] = {}
 
         tempvar = IntVar()
-        templab = Label(dataframe, textvar=tempvar, background='#598392', foreground='white', font='Roboto 11')
+        templab = Label(dataframe, textvar=tempvar, **Theme.LABEL)
         tempvar.trace('w', lambda *args: self.show_not_empty(tempvar, templab))
         self.devicedata[port]['unit_values']['temperature'] = tempvar
 
         lightvar = IntVar()
-        lightlab = Label(dataframe, textvar=lightvar, background='#598392', foreground='white', font='Roboto 11')
+        lightlab = Label(dataframe, textvar=lightvar, **Theme.LABEL)
         lightvar.trace('w', lambda *args: self.show_not_empty(lightvar, lightlab))
 
         self.devicedata[port]['unit_values']['light'] = lightvar
@@ -170,17 +170,13 @@ class Root(Tk):
         self.devicedata[port]['state'] = {}
         statevar = StringVar()
         statevar.set('-')
-        statelab = Label(dataframe, textvar=statevar, background='#598392', foreground='white', font='Roboto 11')
+        statelab = Label(dataframe, textvar=statevar, **Theme.LABEL)
         statelab.grid(row=4, column=1, sticky='nw')
         self.devicedata[port]['state']['name'] = statevar
 
         self.create_graph(dataframe, port)
 
         dataframe.grid(row=0, column=1, sticky='nw')
-
-    def show_not_empty(self, var, label):
-        if var.get() > 0 and not label.winfo_viewable():
-            label.grid(row=3, column=1, sticky='nw')
 
     # creates a graph using the matplotlib package
     def create_graph(self, frame, port):
@@ -194,17 +190,6 @@ class Root(Tk):
     def updategraph(self, port, data):
         self.devicedata[port]['graph'].iterate(data)
 
-    # disables a tab
-    def disable_tab(self, index):
-        self.nb.forget(index)
-
-    def data_button_pressed(self):
-        self.dataview.toggle()
-
-    # used to run a function in a specified interval
-    def interval(self, speed, function):
-        self.after(speed, lambda: [self.interval(speed, function), function()])
-
     # updates the specified tab with new data
     def updatetab(self, device, data):
         for k, v in data.items():
@@ -217,12 +202,10 @@ class Root(Tk):
                     # set action of auto button
                     if k2 == 'light':
                         self.devicedata[device]['settings']['auto']['command'] = \
-                            lambda: self.serialcontroller.output_instruction(device,
-                                                                             Instruction.SET_UNIT.build(Unit.LIGHT))
+                            lambda: self.view_controller.roll_auto_button_pressed(device, Unit.LIGHT)
                     else:
                         self.devicedata[device]['settings']['auto']['command'] = \
-                            lambda: self.serialcontroller.output_instruction(device,
-                                                                             Instruction.SET_UNIT.build(Unit.TEMPERATURE))
+                            lambda: self.view_controller.roll_auto_button_pressed(device, Unit.TEMPERATURE)
 
                     # check if temperature is a normal reading
                     if v2['current'] < 100 or k2 == 'light':
@@ -231,17 +214,6 @@ class Root(Tk):
                         self.devicedata[device]['graph'].updateline('Rol in', v2['close_at'])
                         self.devicedata[device]['graph'].updateline('Rol uit', v2['open_at'])
 
-    # applies the given settings to the unit
-    def applysettings(self, port):
-        roll_in = self.devicedata[port]['settings']['roll_in'].get()
-        roll_out = self.devicedata[port]['settings']['roll_out'].get()
-        if self.devicedata[port]['type'] == 'light':
-            self.serialcontroller.output_instruction(port, Instruction.SET_UNIT_RANGE.build(Unit.LIGHT, roll_out,
-                                                                                            roll_in))
-        elif self.devicedata[port]['type'] == 'temperature':
-            self.serialcontroller.output_instruction(port, Instruction.SET_UNIT_RANGE.build(Unit.TEMPERATURE, roll_out,
-                                                                                            roll_in))
-
-    # updates the data view with new data
-    def updatedataview(self, data):
-        self.dataview.updateData(data)
+    def show_not_empty(self, var, label):
+        if var.get() > 0 and not label.winfo_viewable():
+            label.grid(row=3, column=1, sticky='nw')
