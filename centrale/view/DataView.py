@@ -6,6 +6,7 @@ from view.Theme import *
 from view.Graph import Graph
 
 
+# class that represents the data view
 class DataView:
     labels = ('Hoogste temperatuur', 'Laagste temperatuur', 'Gemiddelde temperatuur', 'Hoogste lichtintensiteit',
               'Laagste lichtintensiteit', 'Gemiddelde lichtintensiteit', 'Aantal eenheden',
@@ -107,6 +108,7 @@ class DataView:
 
         data_frame.grid(row=0, column=0, rowspan=2, padx=(Theme.PADDING, 0), sticky='nw')
 
+    # creates the frame for the graphs and the graphs within the frame
     def create_graph_frame(self, frame):
         graph_frame = Frame(frame)
 
@@ -151,6 +153,8 @@ class DataView:
                     if not unit['name'] == 'MANUAL':
                         unit_values = temp['unit_values'][unit['name'].lower()]
                         current = unit_values['current']
+
+                        # set min and max values
                         if unit['name'] == 'LIGHT':
                             lightunits += 1
                             if self.data['maxlight'].get() < current:
@@ -171,6 +175,8 @@ class DataView:
                                 self.data['tempgraph'].updateline('Laagste temperatuur', current)
                             tempvals.append(current)
                             self.firsttimeset('temperature', current)
+
+        # calculate and set averages
         if tempvals:
             avgtemp = round(sum(tempvals) / len(tempvals), 2)
             if avgtemp < 100:
@@ -181,16 +187,16 @@ class DataView:
             avglight = round(sum(lightvals) / len(lightvals), 2)
             self.data['avglight'].set(avglight)
             self.data['lightgraph'].iterate(avglight)
+
+        # calculate and set uptime
         uptime = datetime.timedelta(seconds=time.time() - self.starttime)
         uptime = uptime - datetime.timedelta(microseconds=uptime.microseconds)
         self.data['uptime'].set(str(uptime))
 
+        # set unit counts
         self.data['units'].set(units)
         self.data['lightunits'].set(lightunits)
         self.data['tempunits'].set(tempunits)
-
-    def updategraphs(self):
-        pass
 
     # sets the min values with the first given values instead of 0
     def firsttimeset(self, type, value):

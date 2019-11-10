@@ -9,6 +9,7 @@ from view.Graph import Graph
 from controller.ViewController import *
 
 
+# class that represents the main window
 class Root(Tk):
 
     tab_settings = ('Uitrol waarde ', 'Inrol waarde ',)
@@ -180,7 +181,7 @@ class Root(Tk):
 
         dataframe.grid(row=0, column=1, sticky='nw')
 
-    # creates a graph using the matplotlib package
+    # creates a graph using the Graph class
     def create_graph(self, frame, port):
         graph = Graph(frame, (4, 3))
         self.devicedata[port]['graph'] = graph

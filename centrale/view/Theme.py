@@ -2,7 +2,8 @@ from enum import Enum
 from tkinter.ttk import Style
 
 
-class Theme():
+# class that contains all style and theme data
+class Theme:
 
     WIDTH = 900
     HEIGHT = 480

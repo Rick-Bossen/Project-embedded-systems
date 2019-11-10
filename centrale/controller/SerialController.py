@@ -9,6 +9,7 @@ class SerialController:
     def __init__(self):
         self.__devices = {}
 
+    # finds all the connected devices
     def find_devices(self):
         ports = list_ports.comports()
         for port in ports:
@@ -16,6 +17,7 @@ class SerialController:
                 self.__devices[port.device] = Device()
         return self.__devices
 
+    # checks if all the devices are connected
     def check_connections(self):
         for device in self.__devices:
             connection = self.__devices[device].get_connection()
@@ -26,9 +28,11 @@ class SerialController:
             elif not connection.isOpen():
                 connection.open()
 
+    # outputs an instruction to the specified device
     def output_instruction(self, device, instruction):
         self.__devices[device].get_connection().write(instruction)
 
+    # returns the live data from the devices
     def read_input(self):
         input = {}
         for device in self.__devices:
