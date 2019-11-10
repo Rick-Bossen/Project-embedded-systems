@@ -118,20 +118,20 @@ class DataView:
                 temp = data[device]
                 if 'unit' in temp:
                     unit = temp['unit']
-                    unit_values = temp['unit_values'][unit['name'].lower()]
-                    print(unit_values)
-                    if unit['name'] == 'LIGHT':
-                        lightunits += 1
-                        if self.data['maxlight'].get() < unit_values['current']:
-                            self.data['maxlight'].set(unit_values['current'])
-                        if self.data['minlight'].get() > unit_values['current']:
-                            self.data['minlight'].set(unit_values['current'])
-                    elif unit['name'] == 'TEMPERATURE':
-                        tempunits += 1
-                        if self.data['maxtemp'].get() < unit_values['current']:
-                            self.data['maxtemp'].set(unit_values['current'])
-                        if self.data['mintemp'].get() > unit_values['current']:
-                            self.data['mintemp'].set(unit_values['current'])
+                    if not unit['name'] == 'MANUAL':
+                        unit_values = temp['unit_values'][unit['name'].lower()]
+                        if unit['name'] == 'LIGHT':
+                            lightunits += 1
+                            if self.data['maxlight'].get() < unit_values['current']:
+                                self.data['maxlight'].set(unit_values['current'])
+                            if self.data['minlight'].get() > unit_values['current']:
+                                self.data['minlight'].set(unit_values['current'])
+                        elif unit['name'] == 'TEMPERATURE':
+                            tempunits += 1
+                            if self.data['maxtemp'].get() < unit_values['current']:
+                                self.data['maxtemp'].set(unit_values['current'])
+                            if self.data['mintemp'].get() > unit_values['current']:
+                                self.data['mintemp'].set(unit_values['current'])
 
         uptime = datetime.timedelta(seconds=time.time() - self.starttime)
         uptime = uptime - datetime.timedelta(microseconds=uptime.microseconds)

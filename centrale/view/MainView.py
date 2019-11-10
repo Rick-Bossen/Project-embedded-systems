@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.ttk import Style
 
-from Enums import Instruction, State
+from Enums import Instruction, State, Unit
 from view.DataView import DataView
 
 # TODO make use of settings
@@ -136,11 +136,10 @@ class Root(Tk):
             text='Uitrollen', background='#EF5B5B', foreground='white', font='Roboto 11', width=20,
             command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_OUT)))
         roll_out_button.grid(row=8, column=1)
-        # TODO make auto button switch unit to auto
-        roll_auto_button = Button(settingsframe,
-            text='Auto', background='#EF5B5B', foreground='white', font='Roboto 11', width=42,
-            command=lambda: self.serialcontroller.output_instruction(port, Instruction.ROLL.build(State.ROLLED_IN)))
+        roll_auto_button = Button(settingsframe, text='Auto', background='#EF5B5B', foreground='white',
+                                  font='Roboto 11', width=42)
         roll_auto_button.grid(row=9, column=0, columnspan=2)
+        self.devicedata[port]['settings']['auto'] = roll_auto_button
 
         settingsframe.grid(row=0, column=0, sticky='nw')
 
@@ -227,6 +226,15 @@ class Root(Tk):
                 if k2 in self.devicedata[device][k] and not k2 == 'light' and not k2 == 'temperature':
                     self.devicedata[device][k][k2].set(v2)
                 elif k2 == 'light' or k2 == 'temperature':
+                    if k2 == 'light':
+                        self.devicedata[device]['settings']['auto']['command'] = \
+                            lambda: self.serialcontroller.output_instruction(device,
+                                                                             Instruction.SET_UNIT.build(Unit.LIGHT))
+                    else:
+                        self.devicedata[device]['settings']['auto']['command'] = \
+                            lambda: self.serialcontroller.output_instruction(device,
+                                                                             Instruction.SET_UNIT.build(Unit.TEMPERATURE))
+
                     self.devicedata[device][k][k2].set(v2['current'])
                     self.updategraph(device, v2['current'])
                     self.devicedata[device]['graph'].updateline('Rol in', v2['close_at'])
