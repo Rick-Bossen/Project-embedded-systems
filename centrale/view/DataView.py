@@ -1,4 +1,6 @@
 from tkinter import *
+import time
+import datetime
 
 
 # TODO add live data and graphs to view
@@ -6,6 +8,7 @@ class DataView:
     def __init__(self, parent, sharedvars):
         self.sharedvars = sharedvars
         self.data = {}
+        self.starttime = time.time()
         self.top = Toplevel(parent)
         self.create_main_frame(self.top)
 
@@ -80,6 +83,11 @@ class DataView:
         lightunitslab.grid(row=9, column=1, sticky='nw')
         self.data['lightunits'] = lightunitsvar
 
+        uptimevar = StringVar()
+        uptimelab = Label(data_frame, textvar=uptimevar)
+        uptimelab.grid(row=10, column=1, sticky='nw')
+        self.data['uptime']= uptimevar
+
         data_frame.grid(row=1, column=0, rowspan=2)
 
     # TODO add graphs to frame
@@ -124,6 +132,10 @@ class DataView:
                             self.data['maxtemp'].set(unit_values['current'])
                         if self.data['mintemp'].get() > unit_values['current']:
                             self.data['mintemp'].set(unit_values['current'])
+
+        uptime = datetime.timedelta(seconds=time.time() - self.starttime)
+        uptime = uptime - datetime.timedelta(microseconds=uptime.microseconds)
+        self.data['uptime'].set(str(uptime))
 
         self.data['units'].set(units)
         self.data['lightunits'].set(lightunits)

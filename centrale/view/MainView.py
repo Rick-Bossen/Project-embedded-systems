@@ -5,11 +5,10 @@ from tkinter.ttk import Style
 from Enums import Instruction, State
 from view.DataView import DataView
 
-import matplotlib
-matplotlib.use('TkAgg')
-
-
 # TODO make use of settings
+from view.Graph import Graph
+
+
 class Root(Tk):
     def __init__(self, sharedvar, serialcontroller):
         super(Root, self).__init__()
@@ -191,7 +190,7 @@ class Root(Tk):
         statelab.grid(row=4, column=1, sticky='nw')
         self.devicedata[port]['state']['name'] = statevar
 
-        self.create_graph(dataframe)
+        self.create_graph(dataframe, port)
 
         dataframe.grid(row=0, column=1, sticky='nw')
 
@@ -200,11 +199,15 @@ class Root(Tk):
             label.grid(row=3, column=1, sticky='nw')
 
     # creates a graph using the matplotlib package
-    def create_graph(self, frame):
-        # TODO implement matplotlib graph instead of canvas
-        placeholder = Canvas(frame, width=340, height=250)
-        placeholder.create_line(0, 0, 500, 500)
-        placeholder.grid(row=5, column=0, rowspan=8, columnspan=2, sticky='nw', padx=10)
+    def create_graph(self, frame, port):
+        graph = Graph(frame, (3, 2), )
+        self.devicedata[port]['graph'] = graph
+
+        canvas = graph.getCanvas()
+        canvas._tkcanvas.grid(row=5, column=0, rowspan=8, columnspan=2, sticky='nw', padx=10, pady=10)
+
+    def updategraph(self, port, data):
+        self.devicedata[port]['graph'].iterate(data)
 
     # disables a tab
     def disable_tab(self, index):
@@ -225,6 +228,9 @@ class Root(Tk):
                     self.devicedata[device][k][k2].set(v2)
                 elif k2 == 'light' or k2 == 'temperature':
                     self.devicedata[device][k][k2].set(v2['current'])
+                    self.updategraph(device, v2['current'])
+                    self.devicedata[device]['graph'].updateline('Rol in', v2['close_at'])
+                    self.devicedata[device]['graph'].updateline('Rol uit', v2['open_at'])
 
     # updates the drop down menu's of all tabs
     def updatedropdowns(self):
